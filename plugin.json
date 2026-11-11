@@ -81,6 +81,30 @@
       "outputs": "object<ok, pipeline, images, elapsed, applied_overrides>"
     },
     {
+      "id": "verify",
+      "title": "出图验收",
+      "entry": "imageqa.verify",
+      "inputs": {
+        "kind": {
+          "type": "string",
+          "required": true,
+          "enum": ["parts", "mc", "panel", "fx", "flat", "alpha", "icon", "tile", "upscale", "turnaround", "lineart"],
+          "desc": "验收类型：10→parts，09→panel+mc，11→fx，08→flat，05→icon，06→tile，07→upscale，04→turnaround，03→lineart"
+        },
+        "paths": {
+          "type": "array<string>",
+          "required": true,
+          "desc": "图片绝对路径。parts 必须按 [head, body] 顺序给两张；其余给一张"
+        },
+        "corner": {
+          "type": "integer",
+          "default": 160,
+          "desc": "panel 的角块边长，和切图时用的一致"
+        }
+      },
+      "outputs": "object<ok, kind, checks, hint, error>"
+    },
+    {
       "id": "slice_panel",
       "title": "九宫格切图",
       "entry": "gameart_pipeline.slice_panel",
