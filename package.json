@@ -1,0 +1,42 @@
+{
+  "name": "dsh-gameart",
+  "version": "0.1.0",
+  "private": true,
+  "description": "游戏美术产线组（ComfyUI / SDXL）的 DSH 封装：四条产线工具 + 专家预设 + 技能库",
+  "type": "module",
+  "main": "index.mjs",
+  "files": [
+    "index.mjs",
+    "lib",
+    "cordis.patch.yml",
+    "skills",
+    "gameart_pipeline",
+    "workflows",
+    "api",
+    "plugin.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "dsh-bundle",
+    "agent-preset",
+    "gameart",
+    "comfyui",
+    "sdxl",
+    "animagine"
+  ],
+  "license": "internal",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node test/check-patch.mjs && node test/check-module.mjs && node test/check-plugin.mjs && node test/check-e2e.mjs && python test/check-imageqa.py"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

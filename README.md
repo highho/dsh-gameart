@@ -226,9 +226,60 @@ Graph(name) → add(ctype, widgets, links) → validate() → to_api() / to_ui()
 
 ---
 
-## 7. 接入 DSH 的映射建议
+## 7. 在 DSH 里使用
 
-`plugin.json` 已是自描述 manifest，字段与常见插件框架一一对应：
+本包同时是一个 **DSH bundle**：装上之后注册三个专家预设，不需要再手工配插件行。
+
+### 7.1 安装
+
+```bash
+# 在 DSH 里（不是 shell）
+plugin_manager { action: install_bundle, target: "G:/AItool/dsh_plugin_gameart" }
+```
+
+装完 `package.json` 里出现 `"dsh-gameart": "link:..."`，bundle 选择列表里多出 `dsh-gameart`。
+**已经开着的会话不会换插件版本**，要新开一个会话才能选到预设。
+
+### 7.2 三个预设
+
+| 预设 id | 名称 | 用途 |
+|---|---|---|
+| `gameart` | 游戏美术产线组 · ComfyUI | 主控。接需求 → 选产线 → 出图 → 验收 → 交付 |
+| `gameart-artist` | 美术出图专员 | 子代理角色。只跑「查状态 → 出图 → 轮询 → 回报」，不评判画面 |
+| `gameart-inspector` | 美术验收专员 | 子代理角色。只做 `gameart_verify` + `read_image`，分三级报问题，不修不重跑 |
+
+`artist` / `inspector` 由主控通过 `artist` / `inspector` 两个委派工具拉起，不必手动切。
+
+### 7.3 七个工具
+
+| 工具 | 作用 |
+|---|---|
+| `gameart_status` | ComfyUI 在不在线、队列多长、底模有没有落盘。**每次开工先调它** |
+| `gameart_list` | 列产线（08/09/10/11）与各产线可覆盖参数 |
+| `gameart_build` | 只把工作流 JSON 落到 `<workspace>/.gameart/workflows`，不出图 |
+| `gameart_run` | 出图。默认后台跑、立刻回 `job_id`；`wait: true` 才阻塞 |
+| `gameart_jobs` | 查任务进度 / 取消 |
+| `gameart_slice9` | 把 09 面板切成九宫格 |
+| `gameart_verify` | 结构验收，不替代眼睛 |
+
+输出统一落在 `<workspace>/.gameart/output/GameArt/` 下，不写进 `node_modules`。
+
+### 7.4 两条硬规则
+
+1. **`gameart_verify` 只判结构**，判不了好不好看。它返回的 `hint` 会提醒你——过没过都要再 `read_image` 看一眼。
+2. **画风锁死日系动漫 / 萌系**（SDXL `animagine-xl-3.1`）。像素风和 3D 渲染在 `plugin.json` 里已列为排除项，不要顺着需求改。
+
+### 7.5 自检
+
+```bash
+npm test    # 五套：补丁结构 / 模块导出 / 工具注册 / 端到端 / 图像验收
+```
+
+---
+
+## 8. 宿主接入的映射建议
+
+`plugin.json` 是自描述 manifest，字段与常见插件框架一一对应：
 
 | manifest 字段 | 宿主侧用途 |
 |---|---|
@@ -249,7 +300,7 @@ Graph(name) → add(ctype, widgets, links) → validate() → to_api() / to_ui()
 
 ---
 
-## 8. 踩坑记录（复现前必读）
+## 9. 踩坑记录（复现前必读）
 
 1. **schema 必须来自真实服务**。`/object_info` 里的枚举（`ckpt_name`、`sampler_name`、ControlNet 列表）才准，手写枚举必然生成打不开的 JSON。
 2. **09 别用生成模型抠图**。SDXL 出的 UI 底板背景不可控，色键和 RMBG 都会翻车，规整矩形用几何 alpha 才稳。
@@ -262,7 +313,7 @@ Graph(name) → add(ctype, widgets, links) → validate() → to_api() / to_ui()
 
 ---
 
-## 9. 联调自检清单
+## 10. 联调自检清单
 
 - [ ] `python -m gameart_pipeline.runner info` → `online=true`、`ckpt_ready=true`、`schema_nodes>1500`
 - [ ] `build` 四条全部 `ok=true`（08=9 / 09=47 / 10=22 / 11=16 节点）
@@ -275,7 +326,7 @@ Graph(name) → add(ctype, widgets, links) → validate() → to_api() / to_ui()
 
 ---
 
-## 10. 已知限制
+## 11. 已知限制
 
 - 09 面板四角为直角，无圆角；需要在引擎侧叠遮罩。
 - 10 只拆 head / body 两层，没有四肢与手部分件；要做骨骼动画请在引擎里继续分件。
