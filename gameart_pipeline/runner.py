@@ -29,6 +29,11 @@ OVERRIDABLE_WIDGETS = (
     "batch_size", "sampler_name", "scheduler", "ckpt_name",
 )
 
+# width/height 只写给「定义画布」的节点。LatentUpscale / ImageScale / ImageCrop 也带
+# width/height，但那是派生尺寸（起稿 768x512 再放大 1.5x 到 1152x768），一起改会把
+# 比例关系一起改坏，所以必须按节点类型挡住。
+SIZE_NODES = ("EmptyLatentImage", "EmptyImage")
+
 META = {
     "00": {
         "title": "角色概念设计",
@@ -45,13 +50,13 @@ META = {
     "02": {
         "title": "表情差分",
         "use": "对 01 立绘只改脸、身体像素 100% 不变，批量出 6~12 个表情",
-        "output": "与输入立绘同尺寸 RGBA PNG，单张一次一个表情",
+        "output": "512x512 RGBA PNG（脸块 300x300 回贴后整体缩到 512），单张一次一个表情",
         "params": ["prompt", "negative", "seed", "denoise", "image"],
     },
     "03": {
         "title": "线稿上色",
         "use": "把线稿/草图按提示词上色成成品，双层 ControlNet 锁线",
-        "output": "1024x1024 RGB PNG",
+        "output": "640x896 RGB PNG",
         "params": ["prompt", "negative", "seed", "steps", "cfg", "denoise", "image"],
     },
     "04": {
@@ -154,8 +159,11 @@ def apply_overrides(graph, overrides):
     for key, val in list(overrides.items()):
         if key not in OVERRIDABLE_WIDGETS:
             continue
+        size_key = key in ("width", "height")
         touched = False
         for node in graph.nodes.values():
+            if size_key and node.get("type") not in SIZE_NODES:
+                continue
             if key in node["widgets"]:
                 node["widgets"][key] = val
                 touched = True

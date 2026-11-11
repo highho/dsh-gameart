@@ -245,6 +245,49 @@ unknown = imageqa.verify("bogus", [bg])
 check("unknown kind -> ok:false", unknown, expect_ok=False)
 print("    %s" % unknown.get("error"))
 
+# --- runner.apply_overrides 语义 -------------------------------------
+# 这段不测图，测的是「覆写只该落在定义画布的节点上」。
+# 04 是 768x512 起稿再 LatentUpscale 1.5x 到 1152x768；早期实现会把 width/height
+# 写给所有带这个 widget 的节点，结果两处一起变，1.5 倍关系被抹平。
+print()
+sys.path.insert(0, ROOT)
+try:
+    from gameart_pipeline import pipelines as P
+    from gameart_pipeline import runner as R
+
+    def _dims(graph, types):
+        out = []
+        for node in graph.nodes.values():
+            if node.get("type") in types:
+                w = node["widgets"]
+                out.append((node["type"], w.get("width"), w.get("height")))
+        return out
+
+    g4 = P.BUILDERS["04"]()
+    applied = R.apply_overrides(g4, {"width": 1024, "height": 768})
+    d4 = dict((t, (w, h)) for t, w, h in _dims(g4, ("EmptyLatentImage", "LatentUpscale")))
+    ok4 = (
+        d4.get("EmptyLatentImage") == (1024, 768)
+        and d4.get("LatentUpscale") == (1152, 768)
+        and "width" in applied and "height" in applied
+    )
+    check("04 覆写只改起稿尺寸，放大目标不变", {"ok": ok4, "dims": d4, "applied": applied}, expect_ok=True)
+
+    # 08 的 ImageScale 是 1920x1080 定版上采样，不该被 width/height 覆写带走
+    g8 = P.BUILDERS["08"]()
+    R.apply_overrides(g8, {"width": 1280, "height": 720})
+    d8 = dict((t, (w, h)) for t, w, h in _dims(g8, ("EmptyLatentImage", "ImageScale")))
+    ok8 = d8.get("EmptyLatentImage") == (1280, 720) and d8.get("ImageScale") == (1920, 1080)
+    check("08 覆写不碰 ImageScale 上采样目标", {"ok": ok8, "dims": d8}, expect_ok=True)
+
+    # seed 仍应广播到所有带 seed 的节点（04 有两个 KSampler，必须同步）
+    g4b = P.BUILDERS["04"]()
+    R.apply_overrides(g4b, {"seed": 777})
+    seeds = sorted(n["widgets"]["seed"] for n in g4b.nodes.values() if "seed" in n["widgets"])
+    check("seed 覆写广播到全部采样器", {"ok": seeds and set(seeds) == {777}, "seeds": seeds}, expect_ok=True)
+except Exception as e:  # noqa: BLE001
+    check("runner.apply_overrides 可导入", {"ok": False, "error": "%s: %s" % (type(e).__name__, e)}, expect_ok=False)
+
 print()
 if failures:
     print("FAILURES: %s" % ", ".join(failures))
