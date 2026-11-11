@@ -107,7 +107,9 @@ def dispatch(cmd, rest):
         # 验收不碰 ComfyUI，也不进 gameart_pipeline，独立成一个只依赖 numpy/PIL 的模块
         kind = rest[0] if rest else ""
         if not kind:
-            raise ValueError("verify 需要验收类型：alpha / flat / panel / mc / parts / fx")
+            raise ValueError(
+                "verify 需要验收类型：alpha / flat / panel / mc / parts / fx / icon / tile / upscale / turnaround / lineart"
+            )
         paths = [p for p in rest[1:] if p and p not in ("-", "null")]
         corner = 160
         if kind == "panel" and len(paths) > 1:

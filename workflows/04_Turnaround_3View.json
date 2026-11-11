@@ -402,24 +402,24 @@
    "id": 900,
    "type": "Note",
    "pos": [
-    -480,
-    60
+    -1400,
+    80
    ],
    "size": [
-    420,
-    260
+    580,
+    240
    ],
    "flags": {},
    "order": -1,
    "mode": 0,
    "inputs": [],
    "outputs": [],
-   "title": "使用说明",
+   "title": "04 三视图",
    "properties": {
     "text": ""
    },
    "widgets_values": [
-    "【04 三视图 / Character Turnaround】\n用途：交付建模/3D 还原用的正-侧-背三视图设定板。\n\n为什么是单张宽幅一次生成，而不是分三个 KSampler 各出一张：\n分三次生成即使锁同一个 seed，模型也会把\"同一个角色\"重新诠释成三个人（实测已翻车）。\n必须让它在同一张画布上一次性画出三联，角色一致性才有保证。\n\n链路：768x512 一次出三联 → LatentUpscale x1.5 → 第二次采样 denoise 0.45（hires fix）\n→ 输出 1152x768 设定板。\n\n调参：\n- 提示词必须写死 \"character turnaround sheet, same character, front view / side view / back view\"，\n  负向要压 \"different characters, inconsistent design\"。\n- 想要更高一致性：装上 IPAdapter + CLIP Vision 后，把 00 产出的概念图作为参考图接入\n  （见待配置清单），这是目前 SD1.5 下最强的角色锁定手段。\n- 比例要精确到 3D 可还原：建议再接 Openpose ControlNet 固定 T-pose（节点已装）。\n\n产出：ComfyUI/output/GameArt/04_Turnaround/"
+    "用途：给建模/动作用的三视图设定稿（正/侧/背）。\\n关键：必须一张宽画布单次出图。三个独立 KSampler 并行会把同一角色画成三个人（已实测确认）。\\n链路：768x512 一次成图 → LatentUpscale ×1.5 到 1152x768 → 二段 denoise 0.45 补细节。\\n正向必须硬写：character turnaround sheet, same character, front view / side view / back view；\\n负向必须硬写：different characters, inconsistent design。\\n复现同一角色：固定 seed，或把 00 选定稿作为图生图输入（denoise 0.5~0.6）。\\n验收：三视图服装/发色/配饰一致，无第 4 个视角。"
    ],
    "color": "#1f3a2f",
    "bgcolor": "#1a2b23"

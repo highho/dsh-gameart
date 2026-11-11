@@ -1,5 +1,5 @@
 /**
- * dsh-gameart —— 游戏美术产线组（ComfyUI / SDXL）的 DSH 工具层。
+ * dsh-gameart —— 游戏美术产线组（ComfyUI / SD1.5 + SDXL 两代）的 DSH 工具层。
  *
  * 设计约束和 godotmaker / sand3d 一致：**不 import 任何 `@deepseek-ai/*` 包**。
  * 工具与技能注册表都以普通 service 的形式通过 `ctx.tools` / `ctx.skills` 消费，
@@ -242,7 +242,7 @@ export function apply(ctx, config = {}) {
         ctx.tools.register({
           name: 'gameart_status',
           description:
-            '检查 ComfyUI 是否在线、版本/显卡/显存、节点 schema 数量、底模 animagine-xl-3.1 是否就位，并列出四条产线。任何产线任务开工前先跑这一条：online=false 说明 ComfyUI 没起来；ckpt_ready=false 说明底模名对不上，跑了也会失败。',
+            '检查 ComfyUI 是否在线、版本/显卡/显存、节点 schema 数量、两代底模（SD1.5 anything-v5-PrtRE 与 SDXL animagine-xl-3.1）是否就位，并列出 12 条产线。任何产线任务开工前先跑这一条：online=false 说明 ComfyUI 没起来；ckpt_ready=false 说明底模名对不上，跑了也会失败。',
           parameters: {
             type: 'object',
             properties: {
@@ -285,7 +285,11 @@ export function apply(ctx, config = {}) {
                 data.online !== true
                   ? 'ComfyUI 没在监听。让用户启动 ComfyUI（E:\\AAAKI\\ComfyUI-aki\\ComfyUI-aki-v3 下的绘世启动器），确认端口 8188 后再重试。'
                   : data.ckpt_ready !== true
-                    ? '底模 animagine-xl-3.1.safetensors 不在 checkpoints 里。改名或补装模型，不要改代码里的 CKPT。'
+                    ? (data.ckpt_sdxl_ready === false && data.ckpt_sd15_ready === false
+                        ? '两代底模都缺：SDXL animagine-xl-3.1.safetensors（08/09/11）与 SD1.5 anything-v5-PrtRE.safetensors（00~07）。补装模型，不要改代码。'
+                        : data.ckpt_sdxl_ready === false
+                          ? '缺 SDXL 底模 animagine-xl-3.1.safetensors，08/09/11 跑不了（00~07 不受影响）。补装模型，不要改代码里的 CKPT。'
+                          : '缺 SD1.5 底模 anything-v5-PrtRE.safetensors，00~07 跑不了（08/09/11 不受影响）。补装模型，不要改代码里的 CKPT_SD15。')
                     : '环境就绪。',
             }
           },
@@ -305,8 +309,8 @@ export function apply(ctx, config = {}) {
             properties: {
               ids: {
                 type: 'array',
-                items: { type: 'string', enum: ['08', '09', '10', '11'] },
-                description: '只构建这几条；不写就四条全构。',
+                items: { type: 'string', enum: ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11'] },
+                description: '只构建这几条；不写就全部 12 条都构。',
               },
             },
             additionalProperties: false,
@@ -344,8 +348,9 @@ export function apply(ctx, config = {}) {
             properties: {
               pipeline_id: {
                 type: 'string',
-                enum: ['08', '09', '10', '11'],
-                description: '08=场景背景 09=UI九宫格 10=角色部件分层 11=光效粒子',
+                enum: ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11'],
+                description:
+                  '00=角色概念 01=立绘透明底 02=表情差分 03=线稿上色 04=三视图 05=道具图标 06=无缝贴图 07=高清放大 08=场景背景 09=UI九宫格 10=角色部件分层 11=光效粒子',
               },
               prompt: {
                 type: 'string',
@@ -533,14 +538,27 @@ export function apply(ctx, config = {}) {
         ctx.tools.register({
           name: 'gameart_verify',
           description:
-            '用 numpy 量一张产线出图的结构性指标并给出判定，别靠肉眼看。kind 五种：parts（10 的头/身两层，必须像素级零重叠、透明区 RGB 全 0）、mc（09 切好的中间块，必须单色不透明）、panel（09 原始面板，四角四边有内容、中间不透明）、fx（11 光效，区分 sprite 与满屏闪光，并检查透明区够暗以免加色叠加烧白）、flat（08 背景，尺寸与是否带 alpha）、alpha（通用 RGBA 体检）。返回的 checks 里逐条写明哪一项没过。出图后、交付前必须跑一次。',
+            '用 numpy 量一张产线出图的结构性指标并给出判定，别靠肉眼看。kind 十一种：parts（10 的头/身两层，必须像素级零重叠、透明区 RGB 全 0）、mc（09 切好的中间块，必须单色不透明）、panel（09 原始面板，四角四边有内容、中间不透明）、fx（11 光效，区分 sprite 与满屏闪光，并检查透明区够暗以免加色叠加烧白）、flat（08 背景，尺寸与是否带 alpha）、alpha（通用 RGBA 体检）、icon（05 道具图标，正方形、背景全透、主体居中且线性占比 45%~98%、透明区 RGB 全 0）、tile（06 无缝贴图，环绕处跳变不得超过图内任意相邻跳变，比值 ≤1.2）、upscale（07 放大图，尺寸够大且拉普拉斯方差证明有真实细节，不是放大了但糊）、turnaround（04 三视图，横版且左中右三段都有主体）、lineart（03 线稿上色，近白纸占比 ≤35% 且彩度 p90 ≥0.12，证明真上了色而不是出了张灰度图）。返回的 checks 里逐条写明哪一项没过。出图后、交付前必须跑一次。',
           parameters: {
             type: 'object',
             properties: {
               kind: {
                 type: 'string',
-                enum: ['parts', 'mc', 'panel', 'fx', 'flat', 'alpha'],
-                description: '验收类型，和产线对应：10→parts，09→panel+mc，11→fx，08→flat。',
+                enum: [
+                  'parts',
+                  'mc',
+                  'panel',
+                  'fx',
+                  'flat',
+                  'alpha',
+                  'icon',
+                  'tile',
+                  'upscale',
+                  'turnaround',
+                  'lineart',
+                ],
+                description:
+                  '验收类型，和产线对应：10→parts，09→panel+mc，11→fx，08→flat，05→icon，06→tile，07→upscale，04→turnaround，03→lineart。',
               },
               paths: {
                 type: 'array',

@@ -44,7 +44,7 @@ E:\AAAKI\ComfyUI-aki\ComfyUI-aki-v3\绘世启动器.exe
 **不要改代码里的 `CKPT` 常量**。两条正路：
 1. 让用户补装 `animagine-xl-3.1.safetensors`；
 2. 用户手上是别的文件名（比如 `animagineXL31.safetensors`）时，让用户改名成
-   `animagine-xl-3.1.safetensors`，这样四条产线都不用动。
+   `animagine-xl-3.1.safetensors`，这样 SDXL 那几条产线都不用动；01/03/04/05/06 另需 SD1.5 底模 `anything-v5-PrtRE.safetensors`。
 
 换底模是另一回事：换成别的 SDXL 动漫模型大多能跑，但风格和 `no humans` 那套负向词
 是照着 animagine 调的，需要重新试。

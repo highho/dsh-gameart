@@ -441,24 +441,24 @@
    "id": 900,
    "type": "Note",
    "pos": [
-    -480,
-    60
+    -1400,
+    80
    ],
    "size": [
-    420,
-    260
+    580,
+    300
    ],
    "flags": {},
    "order": -1,
    "mode": 0,
    "inputs": [],
    "outputs": [],
-   "title": "使用说明",
+   "title": "07 高清放大（A/B 双分支）",
    "properties": {
     "text": ""
    },
    "widgets_values": [
-    "【07 高清放大 / HD Upscale】双分支输出，按用途二选一\n\n分支 A hd_sharp：纯 RealESRGAN anime 4x 模型放大 → lanczos 缩到 1536。\n  · 边缘锐利、线条忠实，不做任何重绘，适合要进引擎的正式资产、UI 贴图、像素要求高的素材。\n  · 缺点：不会凭空补出细节。\n\n分支 B hd_detail：UltimateSDUpscale 分块重绘（2x，denoise 0.22）。\n  · 会补出细节，适合宣传图/展示图。\n  · 源图质量决定上限：整合包自带的 example.png 本身就是低清涂鸦风，放大后只会变平滑、不会变清晰，验收请换成真实产出图再评。\n  · denoise 必须压在 0.25 以下：上一版用 0.30 且开了 seam_fix 0.35，\n    等于接缝处再重绘一遍，实测整图发糊、线条涂抹，已修正。\n  · tile 512→768 减少分块痕迹，seam_fix_mode 关掉避免二次柔化。\n\n目标尺寸：分支 A 改 ImageScale 的 width/height；分支 B 改 upscale_by。\n原图 768 → A 出 1536、B 出 1536，都是 1:1 方图；非方图请按原比例填宽高。\n\n产出：ComfyUI/output/GameArt/07_Upscale/"
+    "用途：已定稿资产放大，两条分支二选一，按需要删掉另一条 SaveImage 即可。\\n【A 分支 hd_sharp｜保真】LoadImage → UpscaleModelLoader(RealESRGAN_x4plus_anime_6B) → ImageUpscaleWithModel 4x → ImageScale lanczos 收到目标尺寸。纯超分不重绘，不引入新细节、不改变画面内容。\\n【B 分支 hd_detail｜补细节】UltimateSDUpscale 分块重绘 2x，tile 512x768。\\n⚠ B 分支 denoise 必须 < 0.25（本图 0.20）。实测 0.30 + seam_fix 0.35 会把整图糊掉，所以 seam_fix_mode 必须是 None，别开。\\n选型：要保真走 A；要补细节走 B。UI 图标与小尺寸素材一律走 A。\\nA 分支 target 尺寸在 ImageScale 的 width/height 上调（当前 1536x864）。"
    ],
    "color": "#1f3a2f",
    "bgcolor": "#1a2b23"

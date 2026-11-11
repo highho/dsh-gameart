@@ -360,11 +360,11 @@
    "id": 900,
    "type": "Note",
    "pos": [
-    -480,
-    60
+    -1400,
+    80
    ],
    "size": [
-    420,
+    580,
     260
    ],
    "flags": {},
@@ -372,12 +372,12 @@
    "mode": 0,
    "inputs": [],
    "outputs": [],
-   "title": "使用说明",
+   "title": "01 立绘透明底",
    "properties": {
     "text": ""
    },
    "widgets_values": [
-    "【01 立绘透明底 / Sprite with Alpha】\n用途：直接产出带 Alpha 通道的透明 PNG，可直接进引擎/UI。\n\n关键参数：\n- BiRefNet_toonout：动漫/游戏立绘专用抠图模型（本机已装），比通用模型边缘干净。\n- background = Alpha：输出 RGBA，不要改成 Color。\n- refine_foreground = 开启：修复半透明边缘与发丝。\n- 若有白边：mask_offset 调 -1 ~ -2；若吞掉发丝：mask_offset 调 +1。\n\n导出规范：PNG-24 带 Alpha，最终尺寸统一 1024x1536（用 07 放大后裁切）。\n产出：ComfyUI/output/GameArt/01_Sprite/\n命名：char_{角色名}_{动作}_{表情}.png"
+    "用途：直接产出带 Alpha 通道的透明 PNG，可直接进引擎/UI。\\n关键参数：\\n- BiRefNet_toonout：动漫/游戏立绘专用抠图模型（本机已装），比通用模型边缘干净。\\n- background = Alpha：输出 RGBA，不要改成 Color。\\n- refine_foreground = 开启：修复半透明边缘与发丝。\\n- 若有白边：mask_offset 调 -1 ~ -2；若吞掉发丝：mask_offset 调 +1。\\n⚠ 本产线不要再接 InvertMask/JoinImageWithAlpha：background=Alpha 时 BiRefNetRMBG 的 out(0) 已经是 RGBA，重复合成会引入第二次反相，把前景清空。\\n导出规范：PNG-24 带 Alpha，尺寸与 01 产线一致 640x896（02 表情差分的脸块坐标依赖这个尺寸，改尺寸必须同步改 02 的 ImageCrop/ImageCompositeMasked 坐标）。"
    ],
    "color": "#1f3a2f",
    "bgcolor": "#1a2b23"

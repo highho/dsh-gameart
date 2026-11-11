@@ -134,6 +134,108 @@ for name in sorted(os.listdir(fx_dir)):
 if fx_tested == 0:
     failures.append("11 no samples")
 
+# --- 00~07 新产线的验收函数 -------------------------------------------
+# 样本不足（00~07 的产出没进 samples/），这里用合成的确定性图当「已知答案」：
+# 无缝 vs 有接缝、居中图标 vs 铺满画布、有点阵细节 vs 全平。
+import numpy as np  # noqa: E402
+from PIL import Image  # noqa: E402
+
+_tmp = os.path.join(HERE, "_probe")
+os.makedirs(_tmp, exist_ok=True)
+import atexit  # noqa: E402
+import shutil  # noqa: E402
+
+atexit.register(lambda: shutil.rmtree(_tmp, ignore_errors=True))
+
+
+def _save(name, arr, mode="RGB"):
+    p = os.path.join(_tmp, name)
+    Image.fromarray(arr.astype("uint8"), mode).save(p)
+    return p
+
+
+_h = _w = 512
+_yy, _xx = np.mgrid[0:_h, 0:_w]
+# 周期整除画布 => 天然无缝
+_base = (
+    (np.sin(2 * np.pi * _xx / 128) * 0.5 + 0.5) * 120
+    + (np.cos(2 * np.pi * _yy / 256) * 0.5 + 0.5) * 80
+    + 20
+)
+seamless = _save("seamless.png", np.dstack([_base, _base * 0.9, _base * 0.7]))
+# 真接缝：把中间一段横向拉伸铺满，左右边缘不连续
+_strip = _base[:, 100:400]
+_bad = np.stack(
+    [np.interp(np.linspace(0, 299, _w), np.arange(300), row) for row in _strip]
+)
+seamed = _save("seamed.png", np.dstack([_bad, _bad * 0.9, _bad * 0.7]))
+
+# 06 无缝贴图
+t = imageqa.verify("tile", [seamless])
+check("06 tile 无缝 -> ok:true", t, expect_ok=True)
+print("    06 seamless  seam_ratio h=%s v=%s" % (t["seam_grad_ratio_h"], t["seam_grad_ratio_v"]))
+t2 = imageqa.verify("tile", [seamed])
+check("06 tile 有接缝 -> ok:false", t2, expect_ok=False)
+assert t2["hint"], "有接缝必须给 hint"
+print("    06 seamed    seam_ratio h=%s (期望被拒)" % t2["seam_grad_ratio_h"])
+# 判别力：两条路径的比值必须拉开量级
+assert t["seam_grad_ratio_h"] < 1.2 <= t2["seam_grad_ratio_h"], "tile 判别力不足"
+
+# 05 道具图标：居中透明底 512 正方形 = 合格
+_icon = np.zeros((512, 512, 4), dtype=np.float32)
+_cy, _cx = np.mgrid[0:512, 0:512]
+_disc = ((_cy - 256) ** 2 + (_cx - 256) ** 2) <= 170**2
+_icon[..., 0][_disc] = 220
+_icon[..., 1][_disc] = 150
+_icon[..., 2][_disc] = 90
+_icon[..., 3][_disc] = 255
+icon_ok = _save("icon_ok.png", _icon, "RGBA")
+ic = imageqa.verify("icon", [icon_ok])
+check("05 icon 居中透明 -> ok:true", ic, expect_ok=True)
+print("    05 icon extent=%s center=%s" % (ic["subject_extent"], ic["center_offset"]))
+
+# 反向：背景不透明（没抠图）必须被拒
+_flat_icon = np.zeros((512, 512, 4), dtype=np.float32)
+_flat_icon[..., :3] = 200
+_flat_icon[..., 3] = 255
+ic_bad = _save("icon_opaque.png", _flat_icon, "RGBA")
+check("05 icon 未抠图 -> ok:false", imageqa.verify("icon", [ic_bad]), expect_ok=False)
+
+# 07 高清放大：大且锐 = 合格；缩到 512 不合格
+# 用带真实高频细节的图（棋盘 + 噪点），正弦图太光滑会正确地被判无细节
+_rng = np.random.default_rng(20261111)
+_by, _bx = np.mgrid[0:1024, 0:1024]
+_chess = ((_by // 8 + _bx // 8) % 2).astype(np.float32) * 180 + 40
+_chess += _rng.normal(0, 12, _chess.shape)
+_sharp = np.dstack([_chess, _chess * 0.85, _chess * 0.65])
+big = _save("big.png", _sharp)
+up = imageqa.verify("upscale", [big])
+check("07 upscale 大且锐 -> ok:true", up, expect_ok=True)
+print("    07 upscale size=%s sharpness=%s" % (up["size"], up["sharpness"]))
+# 同一张图缩到 512：尺寸不够，必须被拒
+check("07 upscale 512 -> ok:false", imageqa.verify("upscale", [seamless]), expect_ok=False)
+# 模糊成一片：有尺寸但没细节，必须被拒
+_blur = np.full((1024, 1024, 3), 128, dtype=np.float32)
+_blur[100:900, 100:900] = 150
+check("07 upscale 糊图 -> ok:false", imageqa.verify("upscale", [_save("blur.png", _blur)]), expect_ok=False)
+
+# 04 三视图：三段都有主体 = 合格；单段 = 不合格
+_ta = np.full((768, 1152, 3), 245, dtype=np.float32)
+for _i in range(3):
+    _x0 = _i * 384 + 120
+    _ta[200:600, _x0 : _x0 + 140] = 40
+ta_ok = _save("turnaround_ok.png", _ta)
+tv = imageqa.verify("turnaround", [ta_ok])
+check("04 turnaround 三视图 -> ok:true", tv, expect_ok=True)
+print("    04 thirds=%s wide=%s" % (tv["thirds_coverage"], tv["checks"]["wide"]))
+_ta_bad = np.full((768, 1152, 3), 245, dtype=np.float32)
+_ta_bad[200:600, 120:260] = 40
+check(
+    "04 turnaround 只有一段 -> ok:false",
+    imageqa.verify("turnaround", [_save("turnaround_bad.png", _ta_bad)]),
+    expect_ok=False,
+)
+
 # --- 错误路径 --------------------------------------------------------
 missing = imageqa.verify("alpha", [os.path.join(S, "nope.png")])
 check("missing file -> ok:false", missing, expect_ok=False)

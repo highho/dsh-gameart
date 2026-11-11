@@ -3,7 +3,7 @@
   "name": "gameart_pipeline",
   "display_name": "游戏美术产线组（ComfyUI）",
   "version": "1.0.0",
-  "description": "基于本地 ComfyUI + SDXL 日式萌系底模的 12 条游戏美术产线；本次交付精修 08 场景背景 / 09 UI 九宫格 / 10 角色部件分层 / 11 光效粒子，并提供可直接调用的 Python 接口。",
+  "description": "基于本地 ComfyUI 的 12 条游戏美术产线（SD1.5 + SDXL 两代日式萌系底模）：00 角色概念 / 01 立绘透明底 / 02 表情差分 / 03 线稿上色 / 04 三视图 / 05 道具图标 / 06 无缝贴图 / 07 高清放大 / 08 场景背景 / 09 UI 九宫格 / 10 角色部件分层 / 11 光效粒子，并提供可直接调用的 Python 接口。",
   "kind": "comfyui-workflow-pack",
   "language": "python",
   "license": "internal",
@@ -64,7 +64,7 @@
       "inputs": {
         "pipeline_id": {
           "type": "string",
-          "enum": ["08", "09", "10", "11"],
+          "enum": ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11"],
           "required": true
         },
         "overrides": {
@@ -113,6 +113,70 @@
   ],
   "pipelines": [
     {
+      "id": "00",
+      "name": "00_Character_Concept",
+      "title": "角色概念设计",
+      "workflow": "workflows/00_Character_Concept.json",
+      "api": "api/api_00.json",
+      "nodes": 8
+    },
+    {
+      "id": "01",
+      "name": "01_Sprite_Alpha",
+      "title": "立绘透明底",
+      "workflow": "workflows/01_Sprite_Alpha.json",
+      "api": "api/api_01.json",
+      "nodes": 9
+    },
+    {
+      "id": "02",
+      "name": "02_Expression_Diff",
+      "title": "表情差分",
+      "workflow": "workflows/02_Expression_Diff.json",
+      "api": "api/api_02.json",
+      "nodes": 16
+    },
+    {
+      "id": "03",
+      "name": "03_Lineart_Colorize",
+      "title": "线稿上色",
+      "workflow": "workflows/03_Lineart_Colorize.json",
+      "api": "api/api_03.json",
+      "nodes": 14
+    },
+    {
+      "id": "04",
+      "name": "04_Turnaround_3View",
+      "title": "三视图设定稿",
+      "workflow": "workflows/04_Turnaround_3View.json",
+      "api": "api/api_04.json",
+      "nodes": 10
+    },
+    {
+      "id": "05",
+      "name": "05_Prop_Icon",
+      "title": "道具图标",
+      "workflow": "workflows/05_Prop_Icon.json",
+      "api": "api/api_05.json",
+      "nodes": 10
+    },
+    {
+      "id": "06",
+      "name": "06_Seamless_Tile",
+      "title": "无缝贴图",
+      "workflow": "workflows/06_Seamless_Tile.json",
+      "api": "api/api_06.json",
+      "nodes": 35
+    },
+    {
+      "id": "07",
+      "name": "07_HD_Upscale",
+      "title": "高清放大",
+      "workflow": "workflows/07_HD_Upscale.json",
+      "api": "api/api_07.json",
+      "nodes": 11
+    },
+    {
       "id": "08",
       "name": "08_Background",
       "title": "场景背景",
@@ -149,7 +213,7 @@
     "comfyui": ">=0.33.2",
     "custom_nodes": ["ComfyUI-Impact-Pack", "ComfyUI-Inspire-Pack", "ComfyUI_IPAdapter_plus", "was-node-suite-comfyui", "ComfyUI_UltimateSDUpscale", "ComfyUI-RMBG", "comfyui_controlnet_aux"],
     "models": {
-      "checkpoints": ["animagine-xl-3.1.safetensors"],
+      "checkpoints": ["anything-v5-PrtRE.safetensors", "animagine-xl-3.1.safetensors"],
       "vae": ["sdxl_vae_fp16_fix.safetensors"],
       "clip_vision": ["CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors"],
       "ipadapter": ["ip-adapter-plus_sdxl_vit-h.safetensors"],
@@ -163,7 +227,7 @@
   },
   "art_direction": {
     "style": "japanese anime / moe（日式萌系）",
-    "base_model": "SDXL animagine-xl-3.1",
+    "base_model": "00~07 = SD1.5 anything-v5-PrtRE；08/09/11 = SDXL animagine-xl-3.1；10 走 SAM",
     "excluded": ["pixel art", "3D render/model"]
   }
 }

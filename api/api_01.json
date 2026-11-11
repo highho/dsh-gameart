@@ -1,0 +1,102 @@
+{
+ "1": {
+  "class_type": "CheckpointLoaderSimple",
+  "inputs": {
+   "ckpt_name": "anything-v5-PrtRE.safetensors"
+  }
+ },
+ "2": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "masterpiece, best quality, highly detailed, official art, clean lineart, anime game art, cel shading, sharp focus, vibrant colors, game character sprite, full body, standing, front view, 1girl, silver hair, blue eyes, fantasy knight armor, blue cape, longsword in right hand, neutral expression, T-pose ready, feet visible, soft even lighting, plain white background",
+   "clip": [
+    "1",
+    1
+   ]
+  }
+ },
+ "3": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "lowres, worst quality, low quality, normal quality, blurry, jpeg artifacts, bad anatomy, bad hands, bad proportions, extra digits, fewer digits, missing fingers, watermark, signature, username, text, logo, cropped, out of frame, border, frame, multiple views, multiple girls, sketch, monochrome, greyscale",
+   "clip": [
+    "1",
+    1
+   ]
+  }
+ },
+ "4": {
+  "class_type": "EmptyLatentImage",
+  "inputs": {
+   "width": 640,
+   "height": 896,
+   "batch_size": 1
+  }
+ },
+ "5": {
+  "class_type": "KSampler",
+  "inputs": {
+   "seed": 20261111,
+   "steps": 30,
+   "cfg": 7.5,
+   "sampler_name": "dpmpp_2m",
+   "scheduler": "karras",
+   "denoise": 1.0,
+   "model": [
+    "1",
+    0
+   ],
+   "positive": [
+    "2",
+    0
+   ],
+   "negative": [
+    "3",
+    0
+   ],
+   "latent_image": [
+    "4",
+    0
+   ]
+  }
+ },
+ "6": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "5",
+    0
+   ],
+   "vae": [
+    "1",
+    2
+   ]
+  }
+ },
+ "7": {
+  "class_type": "BiRefNetRMBG",
+  "inputs": {
+   "model": "BiRefNet_toonout",
+   "sensitivity": 1.0,
+   "mask_blur": 0,
+   "mask_offset": 0,
+   "invert_output": false,
+   "refine_foreground": true,
+   "background": "Alpha",
+   "image": [
+    "6",
+    0
+   ]
+  }
+ },
+ "8": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/01_Sprite/sprite_alpha",
+   "images": [
+    "7",
+    0
+   ]
+  }
+ }
+}

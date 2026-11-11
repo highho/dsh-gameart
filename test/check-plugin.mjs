@@ -80,6 +80,28 @@ function makeCtx({ withSkills = true } = {}) {
 
   // run 的枚举必须和产线一致
   assert.deepStrictEqual(tools.get('gameart_run').parameters.properties.pipeline_id.enum, [
+    '00',
+    '01',
+    '02',
+    '03',
+    '04',
+    '05',
+    '06',
+    '07',
+    '08',
+    '09',
+    '10',
+    '11',
+  ])
+  assert.deepStrictEqual(tools.get('gameart_build').parameters.properties.ids.items.enum, [
+    '00',
+    '01',
+    '02',
+    '03',
+    '04',
+    '05',
+    '06',
+    '07',
     '08',
     '09',
     '10',
@@ -197,7 +219,15 @@ function makeCtx({ withSkills = true } = {}) {
   const full = await verify.execute({ kind: 'flat', paths: ['a.png'] })
   assert.strictEqual(full.ok, false)
   assert.ok(full.error.length > 0)
-  console.log('verify 参数校验: ok（先本地判参，再进桥接）')
+
+  // kind 枚举必须覆盖十二条产线的验收需要
+  const kinds = verify.parameters.properties.kind.enum
+  assert.deepStrictEqual(
+    kinds,
+    ['parts', 'mc', 'panel', 'fx', 'flat', 'alpha', 'icon', 'tile', 'upscale', 'turnaround', 'lineart'],
+    'verify 的 kind 枚举不对',
+  )
+  console.log('verify 参数校验: ok（先本地判参，再进桥接；kind 11 种）')
 }
 
 console.log('\nALL CHECKS PASSED')

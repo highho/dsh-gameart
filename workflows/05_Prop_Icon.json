@@ -401,24 +401,24 @@
    "id": 900,
    "type": "Note",
    "pos": [
-    -480,
-    60
+    -1400,
+    80
    ],
    "size": [
-    420,
-    260
+    580,
+    300
    ],
    "flags": {},
    "order": -1,
    "mode": 0,
    "inputs": [],
    "outputs": [],
-   "title": "使用说明",
+   "title": "05 道具图标",
    "properties": {
     "text": ""
    },
    "widgets_values": [
-    "【05 道具图标 / Item Icon】\n用途：背包/商店/掉落物图标，统一 512x512 透明底。\n\n规范（游戏 UI 通用）：\n- 主体居中，占画布 70%~80%，四周留 10%~15% 安全边，避免 UI 框裁切。\n- 单一物体，不能出现多个同类物（已写入负向）。\n- 3/4 等距视角比纯正面更有体积感。\n- 输出统一 RGBA，禁止带背景色，防止暗色 UI 出现白方块。\n\n产出：ComfyUI/output/GameArt/05_Icon/\n命名：item_{道具名}_{品质}.png（common/rare/epic/legendary 用 06 后处理换描边色）"
+    "用途：装备/道具/材料图标，512x512 RGBA，一次 4 张候选。\\n构图：主体占画布 70~80%，四周留 10~15% 安全边，单个物体、3/4 等距视角。\\n正向必须写 single object；负向必须写 multiple objects, pattern, background detail。\\n链路：SDXL 768x768 batch4 → VAEDecode → BiRefNetRMBG(background=Alpha) → ImageScale lanczos 512x512 center → SaveImage。\\n⚠ 抠图链路同 01：background=Alpha 时 out(0) 已是 RGBA，不要再接 InvertMask/JoinImageWithAlpha（会二次反相把主体清空）。\\n命名：GameArt/05_Icon/item_{道具名}_{品质}.png，品质用 n/r/sr/ssr。\\n验收：主体完整不出界、背景全透（alpha==0 区域 RGB 归一）、无多余物体。"
    ],
    "color": "#1f3a2f",
    "bgcolor": "#1a2b23"

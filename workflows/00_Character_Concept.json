@@ -299,24 +299,24 @@
    "id": 900,
    "type": "Note",
    "pos": [
-    -480,
-    60
+    -1400,
+    80
    ],
    "size": [
-    420,
-    260
+    580,
+    200
    ],
    "flags": {},
    "order": -1,
    "mode": 0,
    "inputs": [],
    "outputs": [],
-   "title": "使用说明",
+   "title": "00 角色概念设计",
    "properties": {
     "text": ""
    },
    "widgets_values": [
-    "【00 角色概念设计 / Character Concept】\n用途：出方案阶段快速铺量，一次 4 张 640x896。\n\n操作位：\n- 正向提示词：按「风格标签 → 主体 → 服饰道具 → 表情 → 光照 → 背景」顺序写。\n- batch_size：铺量建议 4，定稿前改 1 并锁 seed 微调。\n- seed：确认构图后固定 seed，只改提示词细节做强控制。\n\n产出：ComfyUI/output/GameArt/00_Concept/\n命名建议：char_{角色名}_{方案号}.png\n\n定稿后接 01 立绘透明底工作流出正式资产。"
+    "用途：出方案阶段快速铺量，一次 4 张 640x896。\\n链路：SDXL 640x896 batch4 → VAEDecode → SaveImage。\\n操作位：正向按「风格标签 → 主体 → 服饰道具 → 表情 → 光照 → 背景」顺序写。\\nbatch_size：铺量建议 4，定稿前改 1 并锁 seed 微调。\\nseed：确认构图后固定 seed，只改提示词细节做强控制。\\n定稿后接 01 立绘透明底工作流出正式资产。"
    ],
    "color": "#1f3a2f",
    "bgcolor": "#1a2b23"

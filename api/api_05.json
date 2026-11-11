@@ -1,0 +1,115 @@
+{
+ "1": {
+  "class_type": "CheckpointLoaderSimple",
+  "inputs": {
+   "ckpt_name": "anything-v5-PrtRE.safetensors"
+  }
+ },
+ "2": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "masterpiece, best quality, highly detailed, official art, clean lineart, anime game art, cel shading, sharp focus, vibrant colors, game item icon, inventory icon, one single object, centered, front view, 3/4 isometric angle, magic healing potion bottle, red liquid, cork stopper, glass reflection, subtle glow, clean silhouette, plain white background, no text",
+   "clip": [
+    "1",
+    1
+   ]
+  }
+ },
+ "3": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "lowres, worst quality, low quality, normal quality, blurry, jpeg artifacts, bad anatomy, bad hands, bad proportions, extra digits, fewer digits, missing fingers, watermark, signature, username, text, logo, cropped, out of frame, border, frame, multiple views, multiple girls, sketch, monochrome, greyscale, multiple objects, pattern, background detail",
+   "clip": [
+    "1",
+    1
+   ]
+  }
+ },
+ "4": {
+  "class_type": "EmptyLatentImage",
+  "inputs": {
+   "width": 768,
+   "height": 768,
+   "batch_size": 4
+  }
+ },
+ "5": {
+  "class_type": "KSampler",
+  "inputs": {
+   "seed": 20261114,
+   "steps": 26,
+   "cfg": 7.0,
+   "sampler_name": "dpmpp_2m",
+   "scheduler": "karras",
+   "denoise": 1.0,
+   "model": [
+    "1",
+    0
+   ],
+   "positive": [
+    "2",
+    0
+   ],
+   "negative": [
+    "3",
+    0
+   ],
+   "latent_image": [
+    "4",
+    0
+   ]
+  }
+ },
+ "6": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "5",
+    0
+   ],
+   "vae": [
+    "1",
+    2
+   ]
+  }
+ },
+ "7": {
+  "class_type": "BiRefNetRMBG",
+  "inputs": {
+   "model": "BiRefNet_toonout",
+   "sensitivity": 1.0,
+   "mask_blur": 0,
+   "mask_offset": 0,
+   "invert_output": false,
+   "refine_foreground": true,
+   "background": "Alpha",
+   "image": [
+    "6",
+    0
+   ]
+  }
+ },
+ "8": {
+  "class_type": "ImageScale",
+  "inputs": {
+   "upscale_method": "lanczos",
+   "width": 512,
+   "height": 512,
+   "crop": "center",
+   "image": [
+    "7",
+    0
+   ]
+  }
+ },
+ "9": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/05_Icon/item_icon",
+   "images": [
+    "8",
+    0
+   ]
+  }
+ }
+}

@@ -1,0 +1,496 @@
+{
+ "1": {
+  "class_type": "CheckpointLoaderSimple",
+  "inputs": {
+   "ckpt_name": "anything-v5-PrtRE.safetensors"
+  }
+ },
+ "2": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "masterpiece, best quality, highly detailed, official art, clean lineart, anime game art, cel shading, sharp focus, vibrant colors, seamless tileable texture, top-down view, hand-painted game texture, mossy stone bricks, cracked stone floor, green moss, subtle dirt, even lighting, no shadow gradient, no vignette",
+   "clip": [
+    "1",
+    1
+   ]
+  }
+ },
+ "3": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "lowres, worst quality, low quality, normal quality, blurry, jpeg artifacts, bad anatomy, bad hands, bad proportions, extra digits, fewer digits, missing fingers, watermark, signature, username, text, logo, cropped, out of frame, border, frame, multiple views, multiple girls, sketch, monochrome, greyscale, border, frame, vignette, gradient",
+   "clip": [
+    "1",
+    1
+   ]
+  }
+ },
+ "4": {
+  "class_type": "ControlNetLoader",
+  "inputs": {
+   "control_net_name": "control_v11f1e_sd15_tile_fp16.safetensors"
+  }
+ },
+ "5": {
+  "class_type": "EmptyLatentImage",
+  "inputs": {
+   "width": 512,
+   "height": 512,
+   "batch_size": 1
+  }
+ },
+ "6": {
+  "class_type": "KSampler",
+  "inputs": {
+   "seed": 20261115,
+   "steps": 26,
+   "cfg": 7.0,
+   "sampler_name": "dpmpp_2m",
+   "scheduler": "karras",
+   "denoise": 1.0,
+   "model": [
+    "1",
+    0
+   ],
+   "positive": [
+    "2",
+    0
+   ],
+   "negative": [
+    "3",
+    0
+   ],
+   "latent_image": [
+    "5",
+    0
+   ]
+  }
+ },
+ "7": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "6",
+    0
+   ],
+   "vae": [
+    "1",
+    2
+   ]
+  }
+ },
+ "8": {
+  "class_type": "EmptyImage",
+  "inputs": {
+   "width": 512,
+   "height": 512,
+   "batch_size": 1,
+   "color": 0
+  }
+ },
+ "9": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 256,
+   "height": 512,
+   "x": 0,
+   "y": 0,
+   "image": [
+    "7",
+    0
+   ]
+  }
+ },
+ "10": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 256,
+   "height": 512,
+   "x": 256,
+   "y": 0,
+   "image": [
+    "7",
+    0
+   ]
+  }
+ },
+ "11": {
+  "class_type": "ImageCompositeMasked",
+  "inputs": {
+   "x": 0,
+   "y": 0,
+   "resize_source": false,
+   "destination": [
+    "8",
+    0
+   ],
+   "source": [
+    "10",
+    0
+   ]
+  }
+ },
+ "12": {
+  "class_type": "ImageCompositeMasked",
+  "inputs": {
+   "x": 256,
+   "y": 0,
+   "resize_source": false,
+   "destination": [
+    "11",
+    0
+   ],
+   "source": [
+    "9",
+    0
+   ]
+  }
+ },
+ "13": {
+  "class_type": "ControlNetApplyAdvanced",
+  "inputs": {
+   "strength": 0.85,
+   "start_percent": 0.0,
+   "end_percent": 1.0,
+   "positive": [
+    "2",
+    0
+   ],
+   "negative": [
+    "3",
+    0
+   ],
+   "control_net": [
+    "4",
+    0
+   ],
+   "image": [
+    "12",
+    0
+   ],
+   "vae": [
+    "1",
+    2
+   ]
+  }
+ },
+ "14": {
+  "class_type": "VAEEncode",
+  "inputs": {
+   "pixels": [
+    "12",
+    0
+   ],
+   "vae": [
+    "1",
+    2
+   ]
+  }
+ },
+ "15": {
+  "class_type": "KSampler",
+  "inputs": {
+   "seed": 20261116,
+   "steps": 26,
+   "cfg": 6.5,
+   "sampler_name": "dpmpp_2m",
+   "scheduler": "karras",
+   "denoise": 0.62,
+   "model": [
+    "1",
+    0
+   ],
+   "positive": [
+    "13",
+    0
+   ],
+   "negative": [
+    "13",
+    1
+   ],
+   "latent_image": [
+    "14",
+    0
+   ]
+  }
+ },
+ "16": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "15",
+    0
+   ],
+   "vae": [
+    "1",
+    2
+   ]
+  }
+ },
+ "17": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 128,
+   "height": 512,
+   "x": 192,
+   "y": 0,
+   "image": [
+    "16",
+    0
+   ]
+  }
+ },
+ "18": {
+  "class_type": "SolidMask",
+  "inputs": {
+   "value": 1.0,
+   "width": 128,
+   "height": 512
+  }
+ },
+ "19": {
+  "class_type": "FeatherMask",
+  "inputs": {
+   "left": 28,
+   "top": 0,
+   "right": 28,
+   "bottom": 0,
+   "mask": [
+    "18",
+    0
+   ]
+  }
+ },
+ "20": {
+  "class_type": "ImageCompositeMasked",
+  "inputs": {
+   "x": 192,
+   "y": 0,
+   "resize_source": false,
+   "destination": [
+    "12",
+    0
+   ],
+   "source": [
+    "17",
+    0
+   ],
+   "mask": [
+    "19",
+    0
+   ]
+  }
+ },
+ "21": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 512,
+   "height": 256,
+   "x": 0,
+   "y": 0,
+   "image": [
+    "20",
+    0
+   ]
+  }
+ },
+ "22": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 512,
+   "height": 256,
+   "x": 0,
+   "y": 256,
+   "image": [
+    "20",
+    0
+   ]
+  }
+ },
+ "23": {
+  "class_type": "EmptyImage",
+  "inputs": {
+   "width": 512,
+   "height": 512,
+   "batch_size": 1,
+   "color": 0
+  }
+ },
+ "24": {
+  "class_type": "ImageCompositeMasked",
+  "inputs": {
+   "x": 0,
+   "y": 0,
+   "resize_source": false,
+   "destination": [
+    "23",
+    0
+   ],
+   "source": [
+    "22",
+    0
+   ]
+  }
+ },
+ "25": {
+  "class_type": "ImageCompositeMasked",
+  "inputs": {
+   "x": 0,
+   "y": 256,
+   "resize_source": false,
+   "destination": [
+    "24",
+    0
+   ],
+   "source": [
+    "21",
+    0
+   ]
+  }
+ },
+ "26": {
+  "class_type": "ControlNetApplyAdvanced",
+  "inputs": {
+   "strength": 0.85,
+   "start_percent": 0.0,
+   "end_percent": 1.0,
+   "positive": [
+    "2",
+    0
+   ],
+   "negative": [
+    "3",
+    0
+   ],
+   "control_net": [
+    "4",
+    0
+   ],
+   "image": [
+    "25",
+    0
+   ],
+   "vae": [
+    "1",
+    2
+   ]
+  }
+ },
+ "27": {
+  "class_type": "VAEEncode",
+  "inputs": {
+   "pixels": [
+    "25",
+    0
+   ],
+   "vae": [
+    "1",
+    2
+   ]
+  }
+ },
+ "28": {
+  "class_type": "KSampler",
+  "inputs": {
+   "seed": 20261117,
+   "steps": 26,
+   "cfg": 6.5,
+   "sampler_name": "dpmpp_2m",
+   "scheduler": "karras",
+   "denoise": 0.58,
+   "model": [
+    "1",
+    0
+   ],
+   "positive": [
+    "26",
+    0
+   ],
+   "negative": [
+    "26",
+    1
+   ],
+   "latent_image": [
+    "27",
+    0
+   ]
+  }
+ },
+ "29": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "28",
+    0
+   ],
+   "vae": [
+    "1",
+    2
+   ]
+  }
+ },
+ "30": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 512,
+   "height": 128,
+   "x": 0,
+   "y": 192,
+   "image": [
+    "29",
+    0
+   ]
+  }
+ },
+ "31": {
+  "class_type": "SolidMask",
+  "inputs": {
+   "value": 1.0,
+   "width": 512,
+   "height": 128
+  }
+ },
+ "32": {
+  "class_type": "FeatherMask",
+  "inputs": {
+   "left": 0,
+   "top": 28,
+   "right": 0,
+   "bottom": 28,
+   "mask": [
+    "31",
+    0
+   ]
+  }
+ },
+ "33": {
+  "class_type": "ImageCompositeMasked",
+  "inputs": {
+   "x": 0,
+   "y": 192,
+   "resize_source": false,
+   "destination": [
+    "25",
+    0
+   ],
+   "source": [
+    "30",
+    0
+   ],
+   "mask": [
+    "32",
+    0
+   ]
+  }
+ },
+ "34": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/06_Tile/tile_seamless_512",
+   "images": [
+    "33",
+    0
+   ]
+  }
+ }
+}

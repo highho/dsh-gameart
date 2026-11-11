@@ -1,15 +1,23 @@
 # gameart_pipeline —— 游戏美术产线插件包
 
-本地 ComfyUI + SDXL（animagine-xl-3.1）驱动的游戏美术素材生产线，本次精修并实测通过 4 条产线：
+本地 ComfyUI 驱动的游戏美术素材生产线（00~07 用 SD1.5 `anything-v5-PrtRE`，08/09/11 用 SDXL `animagine-xl-3.1`），12 条产线全部构建通过（`ALL_OK`）：
 
 | 产线 | 能力 | 产物 |
 |---|---|---|
+| 00 角色概念设计 | 出方案阶段铺量 | 640×896 RGB PNG ×4 |
+| 01 立绘透明底 | BiRefNet 抠图，可进引擎/UI | 640×896 RGBA PNG |
+| 02 表情差分 | 只改脸，身体像素 100% 不变 | 与输入同尺寸 RGBA PNG |
+| 03 线稿上色 | 双层 ControlNet 锁线 | 1024×1024 RGB PNG |
+| 04 三视图设定稿 | 正/侧/背一张宽画布 | 1152×768 RGB PNG |
+| 05 道具图标 | 单物体 3/4 等距视角 | 512×512 RGBA PNG ×4 |
+| 06 无缝贴图 | 四向无缝，可 3×3 平铺 | 512×512 RGB PNG |
+| 07 高清放大 | A 纯超分 / B 分块重绘双分支 | 双分支各一张 |
 | 08 场景背景 | 无人物横版场景 | 1920×1080 RGB PNG |
 | 09 UI 九宫格 | UI 元素板 + 可 9-slice 拉伸面板 | 1024×1024 RGBA PNG + 9 块切图 |
 | 10 角色部件 | SAM 拆件，head/body 互斥分层 | 640×896 RGBA ×2 |
 | 11 光效粒子 | 黑底加色混合特效贴图 | 1024×1024 RGBA PNG |
 
-风格固定为日式萌系，不含像素风、不含 3D 模型。
+风格固定为日式萌系，不含像素风、不含 3D 模型。底模分两代：**00~07 全部跑 SD1.5 `anything-v5-PrtRE`**（03/06 的 ControlNet 只有 SD1.5 权重，混用 SDXL 会加载失败），**08/09/11 跑 SDXL `animagine-xl-3.1`**（10 走 SAM 分割，不加载底模）。
 
 ---
 
@@ -22,20 +30,20 @@ dsh_plugin_gameart/
 ├─ gameart_pipeline/               # Python 包（宿主唯一需要 import 的东西）
 │  ├─ __init__.py                  # 导出 list_pipelines / build / run / slice_panel / info
 │  ├─ runner.py                    # 对外接口层
-│  ├─ pipelines.py                 # 08~11 四条产线的图定义（Graph DSL）
+│  ├─ pipelines.py                 # 00~11 十二条产线的图定义（Graph DSL）
 │  ├─ wf_lib.py                    # 工作流构建器：API 真源 → UI JSON + 校验 + 提交
 │  ├─ slicing.py                   # 9-slice 切图（按 alpha 求 bbox，中心块均色重建）
 │  └─ objinfo_latest.json          # 节点 schema 快照（3MB，离线自举用）
 ├─ workflows/                      # 12 个 UI 格式工作流，ComfyUI 前端可直接拖入
 ├─ api/                            # 08~11 的 API 格式（提交 /prompt 的形态）
-├─ samples/                        # 本次实跑产物，按产线分目录 08/ 09/ 10/ 11/
+├─ samples/                        # 实跑产物，按产线分目录 08/ 09/ 10/ 11/
 └─ scripts/
    ├─ build_00_07_reference.py     # 00~07 的构建脚本（参考，未注册进插件 API）
    ├─ slice9.py                    # 切图 CLI 版
    └─ check_seam.py / check_seam2.py  # 9 块合成接缝校验
 ```
 
-`workflows/` 里的 00~07 是第一版（底模 anything-v5，SD1.5），与本插件注册的 08~11（SDXL）不是同一代。它们只作为参考随包提供，**未注册进 `run()`**，因为本轮没有对它们做实测复验。要启用请自行跑 `scripts/build_00_07_reference.py` 重新构建并验证。
+`workflows/` 与 `api/` 里的 00~07 与 08~11 两代底模都已注册进 `run()`，12 条产线全部可跑。00~07 是 SD1.5 代（底模 anything-v5），08/09/11 是 SDXL 代，10 走 SAM。两代共用同一套参数覆写与验收接口。
 
 ---
 
@@ -122,7 +130,7 @@ else:
 可覆盖参数（`OVERRIDABLE_WIDGETS`）：
 `prompt` `negative` `seed` `steps` `cfg` `denoise` `width` `height` `batch_size` `sampler_name` `scheduler` `ckpt_name`
 
-> `prompt` / `negative` 按图中 `CLIPTextEncode` 出现的**顺序**取第 0 / 第 1 个，四条产线统一先正向后负向。新增产线请沿用该约定，否则覆盖会打到错误节点。
+> `prompt` / `negative` 按图中 `CLIPTextEncode` 出现的**顺序**取第 0 / 第 1 个，所有产线统一先正向后负向。`image` 写入图中唯一的 `LoadImage`（02/03/07 用）。新增产线请沿用该约定，否则覆盖会打到错误节点。
 
 > `seed` 这类带 `control_after_generate` 的整数控件，`to_ui()` 时会在 `widgets_values` 末尾追加 `"randomize"` 占位——UI 格式要求，API 格式不需要。
 
@@ -149,6 +157,62 @@ else:
 ---
 
 ## 4. 各产线细节
+
+### 00 角色概念设计（8 节点）
+
+- 用途：出方案阶段铺量。`EmptyLatentImage(640×896, batch=4)` → KSampler(28 步，cfg 7.0，dpmpp_2m/karras) → 保存 4 张候选。
+- 提示词顺序固定为：风格 → 主体 → 服饰道具 → 表情 → 光照 → 背景。负向含 `multiple views, multiple girls, sketch, monochrome`。
+- 输出 `GameArt/00_Concept/char_concept_*.png`（`prefix`，不带扩展名）。选定稿进 01。
+
+### 01 立绘透明底（9 节点）
+
+- 链路：SDXL 640×896 → `KSampler(30 步, cfg 7.5)` → `VAEDecode` → `BiRefNetRMBG`（`BiRefNet_toonout` / `refine_foreground` / `background=Alpha`）→ `SaveImage`。
+- **`background=Alpha` 时 `BiRefNetRMBG` 的 `out(0)` 已经是 RGBA**，不要再接 `InvertMask` + `JoinImageWithAlpha`——会二次反相把前景清空。
+- 白边调 `mask_offset -1~-2`，吞发丝调 `+1`。输出 `GameArt/01_Sprite/sprite_alpha_*.png`。
+- 输出尺寸 640×896 与 00 一致，02 的脸块坐标依赖它。
+
+### 02 表情差分（16 节点）
+
+- 链路：`LoadImage` → `ImageCrop(300×300 @ 170,70)` → `ImageScale(→512)` → `VAEEncode` → `KSampler(denoise 0.35)` → `VAEDecode` → `ImageScale(→300)` → `ImageCompositeMasked(170,70)` 贴回。
+- 贴回遮罩走 `SolidMask(1.0, 300×300)` → `GrowMask(-8, tapered)` → `ImpactGaussianBlurMask(kernel 40, sigma 20)`。**不要换成 `FeatherMask`**：它居中对齐到目标画布，这里必须让遮罩自己落在 (170,70)。
+- 三处坐标必须一致：`ImageCrop` 的 x/y、`ImageScale` 的目标尺寸、`ImageCompositeMasked` 的 x/y。
+- `denoise 0.35~0.55`：越低越保脸型，越高表情变化越大。正向只写表情，不重复外貌。
+- 表情表：neutral / smile / angry / sad / shy / surprised。输出 `GameArt/02_Expression/expr_diff_*.png`。
+
+### 03 线稿上色（14 节点）
+
+- `LoadImage` → `LineArtPreprocessor(resolution 1024)` → 两层 `ControlNetApplyAdvanced` → `EmptyLatentImage(1024²)` → `KSampler(30 步, cfg 7.0, denoise 0.75)`。
+- 双层 ControlNet：第 1 层 `control_v11p_sd15_lineart` `strength 1.0` 全程锁线；第 2 层 `control_v11p_sd15s2_lineart_anime` `strength 0.6 / end_percent 0.7` 只在前 70% 给结构，后段放开让颜色主导。
+- **必须配 SD1.5 底模**（`anything-v5-PrtRE`）：两个 ControlNet 只有 SD1.5 权重，与 SDXL 混用会在加载时失败。
+- `denoise`：0.75 保线，>0.85 会把线稿重画掉。输出 `GameArt/03_Lineart/colorized_*.png`。
+
+### 04 三视图设定稿（10 节点）
+
+- **必须一张宽画布单次出图**：三个独立 KSampler 并行会把同一角色画成三个人（已实测确认）。
+- 链路：`768×512` 一次成图 → `LatentUpscale(nearest-exact → 1152×768)` → 二段 `denoise 0.45` 补细节 → `VAEDecode`。
+- 正向硬写 `character turnaround sheet, three views on one canvas, front view, side profile view, back view arranged left to right, same character in all three views`；负向硬写 `different characters, inconsistent design`。
+- 验收：三视图服装/发色/配饰一致，无第 4 个视角。输出 `GameArt/04_Turnaround/turnaround_*.png`。
+
+### 05 道具图标（10 节点）
+
+- 链路：`768×768 batch=4` → `KSampler(26 步, cfg 7.0)` → `VAEDecode` → `BiRefNetRMBG(background=Alpha)` → `ImageScale(lanczos → 512×512, crop center)` → `SaveImage`。
+- 抠图链路同 01：**不要再接 `InvertMask` / `JoinImageWithAlpha`**。
+- 构图：主体占画布 70~80%，四周留 10~15% 安全边，单物体、3/4 等距视角。正向写 `one single object, centered, plain white background`；负向写 `multiple objects, pattern, background detail`。
+- 输出 `GameArt/05_Icon/item_icon_*.png`；命名 `item_{道具名}_{品质}.png`，品质用 n/r/sr/ssr。
+
+### 06 无缝贴图（35 节点）
+
+- 四步算法：① `EmptyLatentImage(512²)` + `KSampler(26 步, cfg 7.0)` 出普通材质；② 水平环绕 50%（`ImageCrop` 左右半 → `ImageCompositeMasked` 换位到 `EmptyImage` 基底），原左右接缝被移到中央竖线 x=256；③ `control_v11f1e_sd15_tile` `strength 0.85` 重绘全图，只把中央 128px 竖带 `ImageCrop(128×512 @ 192,0)` 羽化贴回（`SolidMask(1.0,128×512)` → `FeatherMask(28,0,28,0)`），两侧边缘像素不动；④ 对竖直方向重复②③，收尾 512×512。
+- 两段重绘 `denoise 0.62 / 0.58`，色彩一致性靠 tile ControlNet 而非提示词。
+- **必须配 SD1.5 底模**（tile ControlNet 只有 SD1.5 权重）。
+- **不要把重绘结果整张贴回**——会把刚修好的接缝重新打散。验收：3×3 平铺无格线，或接缝梯度比 ≤ 1.5。输出 `GameArt/06_Tile/tile_seamless_512_*.png`。
+
+### 07 高清放大（11 节点，双分支）
+
+- 分支 A `hd_sharp`：`UpscaleModelLoader(RealESRGAN_x4plus_anime_6B.pth)` → `ImageUpscaleWithModel` → `ImageScale(lanczos → 1536×864)` → 保存。纯超分不重绘，UI 图标与小资产走这条。
+- 分支 B `hd_detail`：`UltimateSDUpscale(upscale_by 2.0, 20 步, cfg 7.0, denoise 0.20, tile 512×768, mask_blur 8, tile_padding 32, seam_fix None)` → 保存。分块重绘补细节。
+- **分支 B 的 `denoise` 必须低于 0.25**，否则会改动原设定稿的设计细节。
+- 输出 `GameArt/07_Upscale/hd_sharp_*.png` 与 `hd_detail_*.png`。
 
 ### 08 场景背景（9 节点）
 
@@ -204,11 +268,11 @@ Graph(name) → add(ctype, widgets, links) → validate() → to_api() / to_ui()
 
 | 类别 | 文件 |
 |---|---|
-| checkpoints | animagine-xl-3.1.safetensors |
+| checkpoints | anything-v5-PrtRE.safetensors（00~07 用）<br>animagine-xl-3.1.safetensors（08/09/11 用） |
 | vae | sdxl_vae_fp16_fix.safetensors |
 | clip_vision | CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors |
 | ipadapter | ip-adapter-plus_sdxl_vit-h.safetensors |
-| controlnet | controlnet-union-sdxl-promax.safetensors |
+| controlnet | controlnet-union-sdxl-promax.safetensors（SDXL）<br>control_v11p_sd15_lineart_fp16.safetensors<br>control_v11p_sd15s2_lineart_anime_fp16.safetensors<br>control_v11f1e_sd15_tile_fp16.safetensors（后三个给 03/06，均为 SD1.5） |
 | RMBG | RMBG-2.0.safetensors |
 | embeddings | EasyNegative.safetensors |
 | ultralytics bbox | face_yolov8m.pt / hand_yolov8s.pt |
@@ -255,7 +319,7 @@ plugin_manager { action: install_bundle, target: "G:/AItool/dsh_plugin_gameart" 
 | 工具 | 作用 |
 |---|---|
 | `gameart_status` | ComfyUI 在不在线、队列多长、底模有没有落盘。**每次开工先调它** |
-| `gameart_list` | 列产线（08/09/10/11）与各产线可覆盖参数 |
+| `gameart_list` | 列产线（00~11）与各产线可覆盖参数 |
 | `gameart_build` | 只把工作流 JSON 落到 `<workspace>/.gameart/workflows`，不出图 |
 | `gameart_run` | 出图。默认后台跑、立刻回 `job_id`；`wait: true` 才阻塞 |
 | `gameart_jobs` | 查任务进度 / 取消 |
@@ -267,7 +331,7 @@ plugin_manager { action: install_bundle, target: "G:/AItool/dsh_plugin_gameart" 
 ### 7.4 两条硬规则
 
 1. **`gameart_verify` 只判结构**，判不了好不好看。它返回的 `hint` 会提醒你——过没过都要再 `read_image` 看一眼。
-2. **画风锁死日系动漫 / 萌系**（SDXL `animagine-xl-3.1`）。像素风和 3D 渲染在 `plugin.json` 里已列为排除项，不要顺着需求改。
+2. **画风锁死日系动漫 / 萌系**（SD1.5 `anything-v5-PrtRE` + SDXL `animagine-xl-3.1`）。像素风和 3D 渲染在 `plugin.json` 里已列为排除项，不要顺着需求改。
 
 ### 7.5 自检
 
@@ -316,7 +380,7 @@ npm test    # 五套：补丁结构 / 模块导出 / 工具注册 / 端到端 / 
 ## 10. 联调自检清单
 
 - [ ] `python -m gameart_pipeline.runner info` → `online=true`、`ckpt_ready=true`、`schema_nodes>1500`
-- [ ] `build` 四条全部 `ok=true`（08=9 / 09=47 / 10=22 / 11=16 节点）
+- [ ] `build` 十二条全部 `ok=true`（00=8 / 01=9 / 02=16 / 03=14 / 04=10 / 05=10 / 06=35 / 07=11 / 08=9 / 09=47 / 10=22 / 11=16 节点）
 - [ ] `workflows/` 与 `api/` 下的 JSON 能被 ComfyUI 前端拖入且不报错
 - [ ] 先用 `run("11")` 冒烟（16 节点最快）
 - [ ] `run("08")` 出图 1920×1080 RGB

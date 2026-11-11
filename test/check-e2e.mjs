@@ -105,8 +105,21 @@ await call('fx 光效贴图', { kind: 'fx', paths: [path.join(S, '11/fx_energy_0
 
 await call('fx 满屏闪光应拒绝', { kind: 'fx', paths: [path.join(S, '11/fx_energy_00001_.png')] }, (v) => v.ok === false && v.style === 'full_frame' && typeof v.hint === 'string')
 
+// 新增产线的验收器：经真实的桥接层再走一遍，确认参数编排没接错
+await call('icon 未抠图应拒绝', { kind: 'icon', paths: [path.join(S, '09/ui_panel_9slice_00006_.png')] }, (v) => v.ok === false && v.checks.bg_transparent === false && typeof v.hint === 'string')
+
+await call('tile 场景图应判有接缝', { kind: 'tile', paths: [path.join(S, '08/bg_scene_00001_.png')] }, (v) => v.kind === 'tile' && v.checks.square === false && v.checks.seam_h_ok === false)
+
+await call('upscale 背景图合格', { kind: 'upscale', paths: [path.join(S, '08/bg_scene_00001_.png')] }, (v) => v.ok === true && v.checks.big_side === true && v.sharpness > 20)
+
+await call('turnaround 背景图应拒绝', { kind: 'turnaround', paths: [path.join(S, '08/bg_scene_00001_.png')] }, (v) => v.kind === 'turnaround' && typeof v.checks.three_panels === 'boolean')
+
 // 桥接层错误也要能回来，不能抛
 await call('不存在的文件', { kind: 'alpha', paths: [path.join(S, 'nope.png')] }, (v) => v.ok === false && typeof v.error === 'string')
+
+await call('lineart 背景图应判为未上色', { kind: 'lineart', paths: [path.join(S, '08/bg_scene_00001_.png')] }, (v) => v.kind === 'lineart' && typeof v.checks.paper_low === 'boolean' && typeof v.sat_p90 === 'number')
+await call('lineart 透明立绘应拒绝', { kind: 'lineart', paths: [path.join(S, '10/part_head_00010_.png')] }, (v) => v.ok === false && typeof v.hint === 'string')
+await call('未知 kind 要列全 11 种', { kind: 'nonsense', paths: [path.join(S, '08/bg_scene_00001_.png')] }, (v) => v.ok === false && /turnaround/.test(v.error) && /upscale/.test(v.error) && /icon/.test(v.error) && /tile/.test(v.error))
 
 if (failures.length) {
   console.log('\nFAILURES:', failures.join(', '))

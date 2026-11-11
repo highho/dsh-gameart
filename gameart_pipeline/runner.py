@@ -30,6 +30,54 @@ OVERRIDABLE_WIDGETS = (
 )
 
 META = {
+    "00": {
+        "title": "角色概念设计",
+        "use": "出方案阶段铺量：一次 4 张同角色不同构图，定稿后进 01",
+        "output": "640x896 RGB PNG，batch=4（一次 4 张候选）",
+        "params": ["prompt", "negative", "seed", "steps", "cfg"],
+    },
+    "01": {
+        "title": "立绘透明底",
+        "use": "直接产出带 Alpha 的透明立绘，可进引擎/UI；是 02 表情差分的输入",
+        "output": "640x896 RGBA PNG（BiRefNet_toonout 抠图，背景全透）",
+        "params": ["prompt", "negative", "seed", "steps", "cfg"],
+    },
+    "02": {
+        "title": "表情差分",
+        "use": "对 01 立绘只改脸、身体像素 100% 不变，批量出 6~12 个表情",
+        "output": "与输入立绘同尺寸 RGBA PNG，单张一次一个表情",
+        "params": ["prompt", "negative", "seed", "denoise", "image"],
+    },
+    "03": {
+        "title": "线稿上色",
+        "use": "把线稿/草图按提示词上色成成品，双层 ControlNet 锁线",
+        "output": "1024x1024 RGB PNG",
+        "params": ["prompt", "negative", "seed", "steps", "cfg", "denoise", "image"],
+    },
+    "04": {
+        "title": "三视图设定稿",
+        "use": "给建模/动作用的正面/侧面/背面三视图，单张宽画布一次成图",
+        "output": "1152x768 RGB PNG（768x512 起稿，潜空间放大 1.5x 二段补细节）",
+        "params": ["prompt", "negative", "seed", "steps", "cfg"],
+    },
+    "05": {
+        "title": "道具图标",
+        "use": "装备/道具/材料图标，单物体居中 3/4 等距视角",
+        "output": "512x512 RGBA PNG，batch=4（一次 4 张候选）",
+        "params": ["prompt", "negative", "seed", "steps", "cfg"],
+    },
+    "06": {
+        "title": "无缝贴图",
+        "use": "四向无缝的地面/墙面材质，可 3x3 平铺无格线",
+        "output": "512x512 RGB PNG，四向无缝",
+        "params": ["prompt", "negative", "seed", "steps", "cfg", "denoise"],
+    },
+    "07": {
+        "title": "高清放大",
+        "use": "已定稿资产放大：A 分支纯超分保真，B 分支分块重绘补细节",
+        "output": "双分支各一张：hd_sharp（RealESRGAN 4x→lanczos）与 hd_detail（UltimateSDUpscale 2x）",
+        "params": ["prompt", "negative", "seed", "steps", "cfg", "width", "height", "image"],
+    },
     "08": {
         "title": "场景背景",
         "use": "横版关卡/大厅背景，无人物",
@@ -79,7 +127,8 @@ def apply_overrides(graph, overrides):
     """把宿主传入的参数写入图。返回实际生效的键。
 
     prompt / negative 按 CLIPTextEncode 节点在图中出现的顺序取第 0 / 第 1 个，
-    这是四条产线统一的构图约定（均为先正向后负向）。
+    这是所有产线统一的构图约定（均为先正向后负向）。
+    image 写入图里唯一的 LoadImage 节点（02/03/07 需要外部输入图）。
     """
     overrides = dict(overrides or {})
     applied = []
@@ -93,6 +142,14 @@ def apply_overrides(graph, overrides):
                 applied.append(key)
             else:
                 overrides.pop(key)
+
+    if overrides.get("image"):
+        hits = [nid for nid, n in graph.nodes.items() if n["type"] == "LoadImage"]
+        if hits:
+            graph.nodes[hits[0]]["widgets"]["image"] = overrides.pop("image")
+            applied.append("image")
+        else:
+            overrides.pop("image")
 
     for key, val in list(overrides.items()):
         if key not in OVERRIDABLE_WIDGETS:
@@ -215,7 +272,11 @@ def info():
     required_ckpt = wf_lib.OI.get("CheckpointLoaderSimple", {}) \
         .get("input", {}).get("required", {}).get("ckpt_name", [None, {}])
     choices = required_ckpt[0] if isinstance(required_ckpt, list) and required_ckpt else []
-    out["ckpt_ready"] = P.CKPT in (choices or [])
+    # 两代底模：00~07 用 SD1.5，08/09/11 用 SDXL；两个都得在，否则对应产线跑不起来
+    had = choices or []
+    out["ckpt_ready"] = P.CKPT in had and P.CKPT_SD15 in had
+    out["ckpt_sdxl_ready"] = P.CKPT in had
+    out["ckpt_sd15_ready"] = P.CKPT_SD15 in had
     out["pipelines"] = sorted(P.BUILDERS)
     return out
 

@@ -345,12 +345,280 @@ def verify_fx(path):
     }
 
 
+def verify_icon(path):
+    """05 道具图标：必须是正方形、背景全透、主体居中且占比合理。"""
+    path = _require(path)
+    im = _load(path)
+    w, h = im.size
+    arr = _rgba(im)
+    rgb, alpha = arr[..., :3], arr[..., 3]
+    total = w * h
+
+    corner = alpha[: max(1, h // 20), : max(1, w // 20)]
+    bg_clear = bool(corner.max() <= ALPHA_THR) if corner.size else False
+
+    bbox = _bbox_alpha(arr)
+    if bbox:
+        bx0, by0, bx1, by1 = bbox
+        subject = _nz(((alpha[by0:by1, bx0:bx1] > ALPHA_THR).sum()) / total)
+        # 线性占比：README 说的「主体占画布 70~80%」指的是这个，不是面积
+        extent = max((bx1 - bx0) / float(w), (by1 - by0) / float(h))
+        # 主体中心相对画布中心的偏移（0 = 完全居中）
+        cx = (bx0 + bx1) / 2.0 / w - 0.5
+        cy = (by0 + by1) / 2.0 / h - 0.5
+        offset = float((cx * cx + cy * cy) ** 0.5)
+    else:
+        subject = 0.0
+        extent = 0.0
+        offset = 1.0
+
+    checks = {
+        "has_alpha": bool(im.mode in ("RGBA", "LA", "PA") or "transparency" in im.info),
+        "square": bool(abs(w - h) <= max(2, int(0.02 * max(w, h)))),
+        # 背景要真透（图标进 UI 不垫底）
+        "bg_transparent": bg_clear,
+        # 主体线性尺寸占画布 45%~98%：太小是缩放错了，太满是没抠图/出框
+        "subject_extent": bool(0.45 <= extent <= 0.98),
+        # 主体大致居中
+        "centered": bool(offset <= 0.12),
+        # 透明区 RGB 必须清零，否则引擎会出黑边
+        "clear_rgb_zero": bool(int(rgb[alpha == 0].max()) == 0) if (alpha == 0).any() else True,
+    }
+    hint = None
+    if not checks["bg_transparent"]:
+        hint = "四角不透明：05 的抠图没生效，检查 BiRefNetRMBG 的 background 是否为 Alpha。"
+    elif not checks["subject_extent"]:
+        hint = (
+            "主体线性占比 %.0f%%（应在 45%%~98%%）：太小说明裁剪/缩放错了（检查 ImageScale 是否 lanczos 到 512×512），"
+            "太大说明主体出框或没抠净。prompt 里加 `one single object, centered`。" % (extent * 100)
+        )
+    elif not checks["centered"]:
+        hint = "主体偏离中心 %.3f：prompt 加 `centered`，负向加 `off-center`。背景杂点也会把 alpha 包围盒拉偏。" % offset
+    return {
+        "ok": all(checks.values()),
+        "path": str(path),
+        "size": [w, h],
+        "mode": im.mode,
+        "subject_extent": round(extent, 4),
+        "subject_ratio": subject,
+        "center_offset": round(offset, 4),
+        "alpha_bbox": list(bbox) if bbox else None,
+        "hint": hint,
+        "checks": checks,
+    }
+
+
+def verify_tile(path):
+    """06 无缝贴图：环绕处（末列→首列）的跳变不能超过图内任意相邻列的跳变。
+
+    为什么跟「图内最大跳变」比而不是平均值：真实材质有平缓区和细节区，
+    平均值会被大片平缓区拉低，导致本来无缝的图误报。真正的接缝是**离群值**——
+    它会比图内任何一处相邻列差都大得多；而无缝图的环绕处只是又一处普通相邻列。
+    因此比值 = 环绕差 / 图内最大相邻差，≤1.2 视为看不出接缝。
+    """
+    path = _require(path)
+    im = _load(path)
+    w, h = im.size
+    arr = _rgb(im).astype("float32")
+
+    def diff(a, b):
+        return float(abs(a - b).mean())
+
+    # 水平：末列 → 首列 的环绕差；基线取图内所有相邻列差的最大值
+    seam_h = diff(arr[:, w - 1, :], arr[:, 0, :])
+    inner_h = max((diff(arr[:, x, :], arr[:, x + 1, :]) for x in range(w - 1)), default=0.0)
+    # 垂直：末行 → 首行；基线取所有相邻行差的最大值
+    seam_v = diff(arr[h - 1, :, :], arr[0, :, :])
+    inner_v = max((diff(arr[y, :, :], arr[y + 1, :, :]) for y in range(h - 1)), default=0.0)
+
+    def ratio(seam, inner):
+        if inner > 1e-6:
+            return seam / inner
+        return 0.0 if seam <= 1e-6 else 999.0
+
+    ratio_h = ratio(seam_h, inner_h)
+    ratio_v = ratio(seam_v, inner_v)
+
+    checks = {
+        # 环绕处的跳变不得明显超过图内最剧烈的一处相邻跳变
+        "seam_h_ok": bool(ratio_h <= 1.2),
+        "seam_v_ok": bool(ratio_v <= 1.2),
+        "square": bool(abs(w - h) <= max(2, int(0.02 * max(w, h)))),
+        "not_blank": bool(float(arr.std()) > 2.0),
+    }
+    hint = None
+    if not (checks["seam_h_ok"] and checks["seam_v_ok"]):
+        worse = "水平" if ratio_h > ratio_v else "垂直"
+        hint = (
+            "%s方向有接缝（环绕差 %.1f，图内最大相邻差 %.1f，比值 %.2f，阈值 1.2）。"
+            "检查四步算法是否只贴回了中央 128px 窄带（FeatherMask 28 羽化），"
+            "整图贴回会把刚修好的接缝重新打散。"
+            % (worse, seam_h if worse == "水平" else seam_v,
+               inner_h if worse == "水平" else inner_v,
+               ratio_h if worse == "水平" else ratio_v)
+        )
+    return {
+        "ok": all(checks.values()),
+        "path": str(path),
+        "size": [w, h],
+        "seam_grad_ratio_h": round(ratio_h, 3),
+        "seam_grad_ratio_v": round(ratio_v, 3),
+        "seam_abs_h": round(seam_h, 2),
+        "seam_abs_v": round(seam_v, 2),
+        "inner_max_h": round(inner_h, 2),
+        "inner_max_v": round(inner_v, 2),
+        "hint": hint,
+        "checks": checks,
+    }
+
+
+def verify_upscale(path, min_side=None):
+    """07 高清放大：尺寸必须比源图大，且不能是「放大了但糊」。"""
+    path = _require(path)
+    im = _load(path)
+    w, h = im.size
+    arr = _rgb(im).astype("float32")
+
+    # 清晰度指标：拉普拉斯响应的方差，糊图会明显偏低
+    gray = arr.mean(axis=2)
+    lap = (
+        -4.0 * gray[1:-1, 1:-1]
+        + gray[:-2, 1:-1]
+        + gray[2:, 1:-1]
+        + gray[1:-1, :-2]
+        + gray[1:-1, 2:]
+    )
+    sharpness = float(lap.var())
+
+    checks = {
+        "big_side": bool(max(w, h) >= (min_side or 1024)),
+        "not_blank": bool(float(arr.std()) > 2.0),
+        # 放大图必须有真实高频细节，糊成一团的方差会很低
+        "has_detail": bool(sharpness >= 20.0),
+    }
+    hint = None
+    if not checks["has_detail"]:
+        hint = (
+            "拉普拉斯方差 %.1f 偏低（阈值 20），放大后像被抹平了。"
+            "分支 A 检查是否误用了 ImageScale 而没走 ImageUpscaleWithModel；"
+            "分支 B 检查 denoise 是否被调到 0.25 以上。" % sharpness
+        )
+    return {
+        "ok": all(checks.values()),
+        "path": str(path),
+        "size": [w, h],
+        "sharpness": round(sharpness, 2),
+        "hint": hint,
+        "checks": checks,
+    }
+
+
+def verify_turnaround(path):
+    """04 三视图：宽画布、三段主体（正/侧/背）都要有内容。"""
+    path = _require(path)
+    im = _load(path)
+    w, h = im.size
+    arr = _rgb(im).astype("float32")
+    gray = arr.mean(axis=2)
+
+    # 背景通常是白/浅色：按「明显偏离背景亮度」找主体
+    bg = float(np.median(gray))
+    mask = np.abs(gray - bg) > 18.0
+    coverage = _nz(mask.sum() / (w * h))
+
+    # 三等分，每段都要有主体
+    thirds = []
+    for i in range(3):
+        seg = mask[:, i * w // 3 : (i + 1) * w // 3]
+        thirds.append(_nz(seg.sum() / max(1, seg.size)))
+
+    checks = {
+        "wide": bool(w > h),
+        "three_panels": bool(all(t >= 0.02 for t in thirds)),
+        "coverage_in_range": bool(0.02 <= coverage <= 0.85),
+        "not_blank": bool(float(arr.std()) > 2.0),
+    }
+    hint = None
+    missing = [("左", thirds[0]), ("中", thirds[1]), ("右", thirds[2])]
+    gaps = [n for n, v in missing if v < 0.02]
+    if gaps:
+        hint = (
+            "%s 三分之一几乎没有主体（各段占比 %s）。三视图必须一张宽画布单次出图；"
+            "拆成多个 KSampler 会把同一角色画成不同的人，也会出现空段。"
+            % ("/".join(gaps), [round(t, 3) for t in thirds])
+        )
+    elif not checks["wide"]:
+        hint = "画布不是横版（%dx%d）：04 应为 1152x768 横版。" % (w, h)
+    return {
+        "ok": all(checks.values()),
+        "path": str(path),
+        "size": [w, h],
+        "coverage": coverage,
+        "thirds_coverage": [round(t, 4) for t in thirds],
+        "background_lum": round(bg, 2),
+        "hint": hint,
+        "checks": checks,
+    }
+
+
+
+def verify_lineart(path):
+    """03 线稿上色：必须真的上了色（有饱和度），且不能大面积留白纸。"""
+    path = _require(path)
+    im = _load(path)
+    w, h = im.size
+    rgb = _rgb(im).astype("float32")
+
+    # 白纸残留在「线稿未覆盖」或「上色失败」时出现：近白像素占比过高就判不过
+    paper = (rgb.min(axis=2) >= 238.0)
+    paper_frac = _nz(paper.sum() / (w * h))
+
+    # 上色成功必然有彩度：HSV 的 S 通道中位数
+    mx = rgb.max(axis=2)
+    mn = rgb.min(axis=2)
+    sat = np.where(mx > 1e-6, (mx - mn) / np.maximum(mx, 1e-6), 0.0)
+    sat_med = _nz(float(np.median(sat)))
+    sat_p90 = _nz(float(np.percentile(sat, 90)))
+
+    checks = {
+        "paper_low": bool(paper_frac <= 0.35),
+        "colored": bool(sat_p90 >= 0.12),
+        "not_blank": bool(float(rgb.std()) > 2.0),
+    }
+    hint = None
+    if not checks["paper_low"]:
+        hint = (
+            "近白像素占 %.1f%%，超过 35%%：上色没铺开或线稿大面积留白。"
+            "检查 03 的 ControlNet 强度（线稿两路应分别 1.0 / 0.6）与 denoise 是否被调低。" % (paper_frac * 100)
+        )
+    elif not checks["colored"]:
+        hint = (
+            "彩度 p90 只有 %.3f（需 >= 0.12）：输出接近灰度，等于没上色。"
+            "正向词里补 flat colors / vibrant colors，并确认 LoadImage 喂的是线稿而不是彩色图。" % sat_p90
+        )
+    return {
+        "ok": all(checks.values()),
+        "path": str(path),
+        "size": [w, h],
+        "paper_frac": paper_frac,
+        "sat_median": sat_med,
+        "sat_p90": sat_p90,
+        "hint": hint,
+        "checks": checks,
+    }
+
+
 VERIFIERS = {
     "alpha": verify_alpha,
     "flat": verify_flat,
     "panel": verify_panel,
     "mc": verify_nineslice,
     "fx": verify_fx,
+    "icon": verify_icon,
+    "tile": verify_tile,
+    "upscale": verify_upscale,
+    "turnaround": verify_turnaround,
+    "lineart": verify_lineart,
 }
 
 

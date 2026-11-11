@@ -1,0 +1,186 @@
+{
+ "1": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "example.png"
+  }
+ },
+ "2": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 300,
+   "height": 300,
+   "x": 170,
+   "y": 70,
+   "image": [
+    "1",
+    0
+   ]
+  }
+ },
+ "3": {
+  "class_type": "ImageScale",
+  "inputs": {
+   "upscale_method": "lanczos",
+   "width": 512,
+   "height": 512,
+   "crop": "disabled",
+   "image": [
+    "2",
+    0
+   ]
+  }
+ },
+ "4": {
+  "class_type": "CheckpointLoaderSimple",
+  "inputs": {
+   "ckpt_name": "anything-v5-PrtRE.safetensors"
+  }
+ },
+ "5": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "masterpiece, best quality, highly detailed, official art, clean lineart, anime game art, cel shading, sharp focus, vibrant colors, close-up face, 1girl, silver hair, blue eyes, smiling, happy expression, open mouth, blushing cheeks, looking at viewer, soft lighting",
+   "clip": [
+    "4",
+    1
+   ]
+  }
+ },
+ "6": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "multiple faces, cropped face, helmet covering face, deformed eyes, distorted mouth, lowres, worst quality, low quality, normal quality, blurry, jpeg artifacts, bad anatomy, bad hands, bad proportions, extra digits, fewer digits, missing fingers, watermark, signature, username, text, logo, cropped, out of frame, border, frame, multiple views, multiple girls, sketch, monochrome, greyscale",
+   "clip": [
+    "4",
+    1
+   ]
+  }
+ },
+ "7": {
+  "class_type": "VAEEncode",
+  "inputs": {
+   "pixels": [
+    "3",
+    0
+   ],
+   "vae": [
+    "4",
+    2
+   ]
+  }
+ },
+ "8": {
+  "class_type": "KSampler",
+  "inputs": {
+   "seed": 20261112,
+   "steps": 24,
+   "cfg": 6.5,
+   "sampler_name": "dpmpp_2m",
+   "scheduler": "karras",
+   "denoise": 0.35,
+   "model": [
+    "4",
+    0
+   ],
+   "positive": [
+    "5",
+    0
+   ],
+   "negative": [
+    "6",
+    0
+   ],
+   "latent_image": [
+    "7",
+    0
+   ]
+  }
+ },
+ "9": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "8",
+    0
+   ],
+   "vae": [
+    "4",
+    2
+   ]
+  }
+ },
+ "10": {
+  "class_type": "ImageScale",
+  "inputs": {
+   "upscale_method": "lanczos",
+   "width": 300,
+   "height": 300,
+   "crop": "disabled",
+   "image": [
+    "9",
+    0
+   ]
+  }
+ },
+ "11": {
+  "class_type": "SolidMask",
+  "inputs": {
+   "value": 1.0,
+   "width": 300,
+   "height": 300
+  }
+ },
+ "12": {
+  "class_type": "GrowMask",
+  "inputs": {
+   "expand": -8,
+   "tapered_corners": true,
+   "mask": [
+    "11",
+    0
+   ]
+  }
+ },
+ "13": {
+  "class_type": "ImpactGaussianBlurMask",
+  "inputs": {
+   "kernel_size": 40,
+   "sigma": 20.0,
+   "mask": [
+    "12",
+    0
+   ]
+  }
+ },
+ "14": {
+  "class_type": "ImageCompositeMasked",
+  "inputs": {
+   "x": 170,
+   "y": 70,
+   "resize_source": false,
+   "destination": [
+    "1",
+    0
+   ],
+   "source": [
+    "10",
+    0
+   ],
+   "mask": [
+    "13",
+    0
+   ]
+  }
+ },
+ "15": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/02_Expression/expr_diff",
+   "images": [
+    "14",
+    0
+   ]
+  }
+ }
+}
