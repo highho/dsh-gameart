@@ -817,11 +817,11 @@ def build_07():
                  "【A 分支 hd_sharp｜保真】LoadImage → UpscaleModelLoader"
                  "(RealESRGAN_x4plus_anime_6B) → ImageUpscaleWithModel 4x → "
                  "ImageScale lanczos 收到目标尺寸。纯超分不重绘，不引入新细节、不改变画面内容。\\n"
-                 "【B 分支 hd_detail｜补细节】UltimateSDUpscale 分块重绘 2x，tile 512x768。\\n"
-                 "⚠ B 分支 denoise 必须 < 0.25（本图 0.20）。实测 0.30 + seam_fix 0.35 会把整图糊掉，"
+                 "【B 分支 hd_detail｜补细节】UltimateSDUpscale 分块重绘 2x，tile 768x768。\\n"
+                 "⚠ B 分支 denoise 必须 < 0.25（本图 0.22）。实测 0.30 + seam_fix 0.30 会把整图糊掉，"
                  "所以 seam_fix_mode 必须是 None，别开。\\n"
                  "选型：要保真走 A；要补细节走 B。UI 图标与小尺寸素材一律走 A。\\n"
-                 "A 分支 target 尺寸在 ImageScale 的 width/height 上调（当前 1536x864）。"),
+                 "A 分支 target 尺寸在 ImageScale 的 width/height 上调（当前 1536x1536）。"),
         "x": -1400, "y": 80, "w": 580, "h": 300})
     return g
 
