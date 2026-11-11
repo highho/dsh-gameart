@@ -1,0 +1,548 @@
+{
+ "1": {
+  "class_type": "CheckpointLoaderSimple",
+  "inputs": {
+   "ckpt_name": "animagine-xl-3.1.safetensors"
+  }
+ },
+ "2": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "masterpiece, best quality, amazing quality, very aesthetic, absurdres, game ui element sheet, japanese fantasy ui kit, several separate ui widgets arranged on one canvas: rounded button, progress bar, small icon frame, slider track, tooltip box, gold trim, cherry blossom ornament, semi transparent dark panel, flat color, clean vector-like shapes, crisp edges, evenly spaced, pure white background",
+   "clip": [
+    "1",
+    1
+   ]
+  }
+ },
+ "3": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, artist name, ugly, deformed, character, person, 1girl, face, hands, text, letters, kanji, watermark, photo, 3d render, noisy texture, overlapping widgets, collage of photos, single large panel filling the canvas",
+   "clip": [
+    "1",
+    1
+   ]
+  }
+ },
+ "4": {
+  "class_type": "EmptyLatentImage",
+  "inputs": {
+   "width": 1024,
+   "height": 1024,
+   "batch_size": 1
+  }
+ },
+ "5": {
+  "class_type": "KSampler",
+  "inputs": {
+   "seed": 20261112,
+   "steps": 28,
+   "cfg": 7.0,
+   "sampler_name": "dpmpp_2m",
+   "scheduler": "karras",
+   "denoise": 1.0,
+   "model": [
+    "1",
+    0
+   ],
+   "positive": [
+    "2",
+    0
+   ],
+   "negative": [
+    "3",
+    0
+   ],
+   "latent_image": [
+    "4",
+    0
+   ]
+  }
+ },
+ "6": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "5",
+    0
+   ],
+   "vae": [
+    "1",
+    2
+   ]
+  }
+ },
+ "7": {
+  "class_type": "RMBG",
+  "inputs": {
+   "model": "RMBG-2.0",
+   "sensitivity": 1.0,
+   "process_res": 1024,
+   "mask_blur": 0,
+   "mask_offset": 0,
+   "invert_output": false,
+   "refine_foreground": true,
+   "background": "Alpha",
+   "background_color": "#222222",
+   "image": [
+    "6",
+    0
+   ]
+  }
+ },
+ "8": {
+  "class_type": "InvertMask",
+  "inputs": {
+   "mask": [
+    "7",
+    1
+   ]
+  }
+ },
+ "9": {
+  "class_type": "JoinImageWithAlpha",
+  "inputs": {
+   "image": [
+    "7",
+    0
+   ],
+   "alpha": [
+    "8",
+    0
+   ]
+  }
+ },
+ "10": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/09_UI/ui_element_sheet",
+   "images": [
+    "9",
+    0
+   ]
+  }
+ },
+ "11": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "masterpiece, best quality, amazing quality, very aesthetic, absurdres, game ui dialog panel, ONE single square panel, nine-slice template, perfectly rectangular and centered, fills the whole canvas edge to edge, uniform thick ornamental border on all four sides, border width about one sixth of canvas, corner radius 64, the entire interior filled with solid dark navy blue, the interior is clearly much darker than the pure white background, no pattern and no illustration inside, gold trim and cherry blossom ornament only along the border, flat color, clean vector-like shapes, crisp straight edges, pure white background around the panel",
+   "clip": [
+    "1",
+    1
+   ]
+  }
+ },
+ "12": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, artist name, ugly, deformed, character, person, 1girl, face, text, letters, kanji, watermark, photo, 3d render, noisy texture, multiple panels, collage, bevel, drop shadow, white margin, white frame ring, off center, tilted, perspective, pattern in the center, illustration inside panel, picture frame with photo, white interior, white fill, light gray fill, hollow frame, empty white box, outline only",
+   "clip": [
+    "1",
+    1
+   ]
+  }
+ },
+ "13": {
+  "class_type": "EmptyLatentImage",
+  "inputs": {
+   "width": 1024,
+   "height": 1024,
+   "batch_size": 1
+  }
+ },
+ "14": {
+  "class_type": "KSampler",
+  "inputs": {
+   "seed": 20261113,
+   "steps": 30,
+   "cfg": 7.0,
+   "sampler_name": "dpmpp_2m",
+   "scheduler": "karras",
+   "denoise": 1.0,
+   "model": [
+    "1",
+    0
+   ],
+   "positive": [
+    "11",
+    0
+   ],
+   "negative": [
+    "12",
+    0
+   ],
+   "latent_image": [
+    "13",
+    0
+   ]
+  }
+ },
+ "15": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "14",
+    0
+   ],
+   "vae": [
+    "1",
+    2
+   ]
+  }
+ },
+ "16": {
+  "class_type": "RMBG",
+  "inputs": {
+   "model": "RMBG-2.0",
+   "sensitivity": 1.0,
+   "process_res": 1024,
+   "mask_blur": 0,
+   "mask_offset": 0,
+   "invert_output": false,
+   "refine_foreground": true,
+   "background": "Alpha",
+   "background_color": "#222222",
+   "image": [
+    "15",
+    0
+   ]
+  }
+ },
+ "17": {
+  "class_type": "InvertMask",
+  "inputs": {
+   "mask": [
+    "16",
+    1
+   ]
+  }
+ },
+ "18": {
+  "class_type": "SolidMask",
+  "inputs": {
+   "value": 0.0,
+   "width": 1024,
+   "height": 1024
+  }
+ },
+ "19": {
+  "class_type": "SolidMask",
+  "inputs": {
+   "value": 1.0,
+   "width": 972,
+   "height": 972
+  }
+ },
+ "20": {
+  "class_type": "MaskComposite",
+  "inputs": {
+   "x": 26,
+   "y": 26,
+   "operation": "add",
+   "destination": [
+    "18",
+    0
+   ],
+   "source": [
+    "19",
+    0
+   ]
+  }
+ },
+ "21": {
+  "class_type": "InvertMask",
+  "inputs": {
+   "mask": [
+    "20",
+    0
+   ]
+  }
+ },
+ "22": {
+  "class_type": "JoinImageWithAlpha",
+  "inputs": {
+   "image": [
+    "15",
+    0
+   ],
+   "alpha": [
+    "21",
+    0
+   ]
+  }
+ },
+ "23": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/09_UI/ui_panel_9slice",
+   "images": [
+    "22",
+    0
+   ]
+  }
+ },
+ "24": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 64,
+   "height": 64,
+   "x": 416,
+   "y": 416,
+   "image": [
+    "22",
+    0
+   ]
+  }
+ },
+ "25": {
+  "class_type": "ImageScale",
+  "inputs": {
+   "upscale_method": "bilinear",
+   "width": 1,
+   "height": 1,
+   "crop": "disabled",
+   "image": [
+    "24",
+    0
+   ]
+  }
+ },
+ "26": {
+  "class_type": "ImageScale",
+  "inputs": {
+   "upscale_method": "bilinear",
+   "width": 704,
+   "height": 704,
+   "crop": "disabled",
+   "image": [
+    "25",
+    0
+   ]
+  }
+ },
+ "27": {
+  "class_type": "SolidMask",
+  "inputs": {
+   "value": 1.0,
+   "width": 704,
+   "height": 704
+  }
+ },
+ "28": {
+  "class_type": "InvertMask",
+  "inputs": {
+   "mask": [
+    "27",
+    0
+   ]
+  }
+ },
+ "29": {
+  "class_type": "JoinImageWithAlpha",
+  "inputs": {
+   "image": [
+    "26",
+    0
+   ],
+   "alpha": [
+    "28",
+    0
+   ]
+  }
+ },
+ "30": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 160,
+   "height": 160,
+   "x": 0,
+   "y": 0,
+   "image": [
+    "22",
+    0
+   ]
+  }
+ },
+ "31": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/09_UI/9slice_tl_160x160",
+   "images": [
+    "30",
+    0
+   ]
+  }
+ },
+ "32": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 704,
+   "height": 160,
+   "x": 160,
+   "y": 0,
+   "image": [
+    "22",
+    0
+   ]
+  }
+ },
+ "33": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/09_UI/9slice_tc_704x160",
+   "images": [
+    "32",
+    0
+   ]
+  }
+ },
+ "34": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 160,
+   "height": 160,
+   "x": 864,
+   "y": 0,
+   "image": [
+    "22",
+    0
+   ]
+  }
+ },
+ "35": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/09_UI/9slice_tr_160x160",
+   "images": [
+    "34",
+    0
+   ]
+  }
+ },
+ "36": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 160,
+   "height": 704,
+   "x": 0,
+   "y": 160,
+   "image": [
+    "22",
+    0
+   ]
+  }
+ },
+ "37": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/09_UI/9slice_ml_160x704",
+   "images": [
+    "36",
+    0
+   ]
+  }
+ },
+ "38": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/09_UI/9slice_mc_704x704",
+   "images": [
+    "29",
+    0
+   ]
+  }
+ },
+ "39": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 160,
+   "height": 704,
+   "x": 864,
+   "y": 160,
+   "image": [
+    "22",
+    0
+   ]
+  }
+ },
+ "40": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/09_UI/9slice_mr_160x704",
+   "images": [
+    "39",
+    0
+   ]
+  }
+ },
+ "41": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 160,
+   "height": 160,
+   "x": 0,
+   "y": 864,
+   "image": [
+    "22",
+    0
+   ]
+  }
+ },
+ "42": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/09_UI/9slice_bl_160x160",
+   "images": [
+    "41",
+    0
+   ]
+  }
+ },
+ "43": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 704,
+   "height": 160,
+   "x": 160,
+   "y": 864,
+   "image": [
+    "22",
+    0
+   ]
+  }
+ },
+ "44": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/09_UI/9slice_bc_704x160",
+   "images": [
+    "43",
+    0
+   ]
+  }
+ },
+ "45": {
+  "class_type": "ImageCrop",
+  "inputs": {
+   "width": 160,
+   "height": 160,
+   "x": 864,
+   "y": 864,
+   "image": [
+    "22",
+    0
+   ]
+  }
+ },
+ "46": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/09_UI/9slice_br_160x160",
+   "images": [
+    "45",
+    0
+   ]
+  }
+ }
+}

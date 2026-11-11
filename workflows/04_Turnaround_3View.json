@@ -1,0 +1,538 @@
+{
+ "id": "gameart-04_Turnaround_3View",
+ "revision": 0,
+ "last_node_id": 900,
+ "last_link_id": 12,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "CheckpointLoaderSimple",
+   "pos": [
+    40,
+    80
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      3,
+      8
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      1,
+      2
+     ],
+     "slot_index": 1
+    },
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [],
+     "slot_index": 2
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CheckpointLoaderSimple"
+   },
+   "widgets_values": [
+    "anything-v5-PrtRE.safetensors"
+   ]
+  },
+  {
+   "id": 4,
+   "type": "EmptyLatentImage",
+   "pos": [
+    40,
+    200
+   ],
+   "size": [
+    380,
+    124
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      6
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "EmptyLatentImage"
+   },
+   "widgets_values": [
+    768,
+    512,
+    1
+   ]
+  },
+  {
+   "id": 8,
+   "type": "VAEDecode",
+   "pos": [
+    40,
+    364
+   ],
+   "size": [
+    380,
+    98
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": null
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      12
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 2,
+   "type": "CLIPTextEncode",
+   "pos": [
+    440,
+    80
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      4,
+      9
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "masterpiece, best quality, character turnaround sheet, three views on one canvas, front view, side profile view, back view arranged left to right, same character in all three views, identical outfit and hairstyle, full body, standing straight, t-pose, arms slightly away from body, plain flat white background, even flat lighting, no shadow, 1girl, silver hair, blue eyes, blue and white fantasy adventurer outfit, clean lineart, cel shading, game character design reference sheet"
+   ]
+  },
+  {
+   "id": 3,
+   "type": "CLIPTextEncode",
+   "pos": [
+    440,
+    200
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 2
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      5,
+      10
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "lowres, worst quality, low quality, normal quality, blurry, jpeg artifacts, bad anatomy, bad hands, bad proportions, extra digits, fewer digits, missing fingers, watermark, signature, username, text, logo, cropped, out of frame, border, frame, multiple views, multiple girls, sketch, monochrome, greyscale, different characters, different outfits, inconsistent design, cropped, text, watermark"
+   ]
+  },
+  {
+   "id": 9,
+   "type": "SaveImage",
+   "pos": [
+    440,
+    320
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 12
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "GameArt/04_Turnaround/turnaround"
+   ]
+  },
+  {
+   "id": 5,
+   "type": "KSampler",
+   "pos": [
+    840,
+    80
+   ],
+   "size": [
+    380,
+    228
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 3
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 4
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 5
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 6
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      7
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "widgets_values": [
+    20261110,
+    "randomize",
+    30,
+    7.5,
+    "dpmpp_2m",
+    "karras",
+    1.0
+   ]
+  },
+  {
+   "id": 6,
+   "type": "LatentUpscale",
+   "pos": [
+    1240,
+    80
+   ],
+   "size": [
+    380,
+    150
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 7
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      11
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LatentUpscale"
+   },
+   "widgets_values": [
+    "nearest-exact",
+    1152,
+    768,
+    "disabled"
+   ]
+  },
+  {
+   "id": 7,
+   "type": "KSampler",
+   "pos": [
+    1640,
+    80
+   ],
+   "size": [
+    380,
+    228
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 8
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 9
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 10
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 11
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "widgets_values": [
+    20261110,
+    "randomize",
+    20,
+    7.0,
+    "dpmpp_2m",
+    "karras",
+    0.45
+   ]
+  },
+  {
+   "id": 900,
+   "type": "Note",
+   "pos": [
+    -480,
+    60
+   ],
+   "size": [
+    420,
+    260
+   ],
+   "flags": {},
+   "order": -1,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "title": "使用说明",
+   "properties": {
+    "text": ""
+   },
+   "widgets_values": [
+    "【04 三视图 / Character Turnaround】\n用途：交付建模/3D 还原用的正-侧-背三视图设定板。\n\n为什么是单张宽幅一次生成，而不是分三个 KSampler 各出一张：\n分三次生成即使锁同一个 seed，模型也会把\"同一个角色\"重新诠释成三个人（实测已翻车）。\n必须让它在同一张画布上一次性画出三联，角色一致性才有保证。\n\n链路：768x512 一次出三联 → LatentUpscale x1.5 → 第二次采样 denoise 0.45（hires fix）\n→ 输出 1152x768 设定板。\n\n调参：\n- 提示词必须写死 \"character turnaround sheet, same character, front view / side view / back view\"，\n  负向要压 \"different characters, inconsistent design\"。\n- 想要更高一致性：装上 IPAdapter + CLIP Vision 后，把 00 产出的概念图作为参考图接入\n  （见待配置清单），这是目前 SD1.5 下最强的角色锁定手段。\n- 比例要精确到 3D 可还原：建议再接 Openpose ControlNet 固定 T-pose（节点已装）。\n\n产出：ComfyUI/output/GameArt/04_Turnaround/"
+   ],
+   "color": "#1f3a2f",
+   "bgcolor": "#1a2b23"
+  }
+ ],
+ "links": [
+  [
+   1,
+   1,
+   1,
+   2,
+   0,
+   "CLIP"
+  ],
+  [
+   2,
+   1,
+   1,
+   3,
+   0,
+   "CLIP"
+  ],
+  [
+   3,
+   1,
+   0,
+   5,
+   0,
+   "MODEL"
+  ],
+  [
+   4,
+   2,
+   0,
+   5,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   5,
+   3,
+   0,
+   5,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   6,
+   4,
+   0,
+   5,
+   3,
+   "LATENT"
+  ],
+  [
+   7,
+   5,
+   0,
+   6,
+   0,
+   "LATENT"
+  ],
+  [
+   8,
+   1,
+   0,
+   7,
+   0,
+   "MODEL"
+  ],
+  [
+   9,
+   2,
+   0,
+   7,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   10,
+   3,
+   0,
+   7,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   11,
+   6,
+   0,
+   7,
+   3,
+   "LATENT"
+  ],
+  [
+   12,
+   8,
+   0,
+   9,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.75,
+   "offset": [
+    0,
+    0
+   ]
+  }
+ },
+ "version": 0.4
+}

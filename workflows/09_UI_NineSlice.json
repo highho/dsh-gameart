@@ -1,0 +1,2234 @@
+{
+ "id": "gameart-09_UI_NineSlice",
+ "revision": 0,
+ "last_node_id": 900,
+ "last_link_id": 42,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "CheckpointLoaderSimple",
+   "pos": [
+    40,
+    80
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      3,
+      12
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      1,
+      2,
+      10,
+      11
+     ],
+     "slot_index": 1
+    },
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [],
+     "slot_index": 2
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CheckpointLoaderSimple"
+   },
+   "widgets_values": [
+    "animagine-xl-3.1.safetensors"
+   ]
+  },
+  {
+   "id": 4,
+   "type": "EmptyLatentImage",
+   "pos": [
+    40,
+    200
+   ],
+   "size": [
+    380,
+    124
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      6
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "EmptyLatentImage"
+   },
+   "widgets_values": [
+    1024,
+    1024,
+    1
+   ]
+  },
+  {
+   "id": 6,
+   "type": "VAEDecode",
+   "pos": [
+    40,
+    364
+   ],
+   "size": [
+    380,
+    98
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": null
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      7
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 9,
+   "type": "JoinImageWithAlpha",
+   "pos": [
+    40,
+    502
+   ],
+   "size": [
+    380,
+    98
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "alpha",
+     "type": "MASK",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      9
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "JoinImageWithAlpha"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 13,
+   "type": "EmptyLatentImage",
+   "pos": [
+    40,
+    640
+   ],
+   "size": [
+    380,
+    124
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      15
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "EmptyLatentImage"
+   },
+   "widgets_values": [
+    1024,
+    1024,
+    1
+   ]
+  },
+  {
+   "id": 15,
+   "type": "VAEDecode",
+   "pos": [
+    40,
+    804
+   ],
+   "size": [
+    380,
+    98
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": null
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      16
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 18,
+   "type": "SolidMask",
+   "pos": [
+    40,
+    942
+   ],
+   "size": [
+    380,
+    124
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [
+      18
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SolidMask"
+   },
+   "widgets_values": [
+    0.0,
+    1024,
+    1024
+   ]
+  },
+  {
+   "id": 19,
+   "type": "SolidMask",
+   "pos": [
+    40,
+    1106
+   ],
+   "size": [
+    380,
+    124
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [
+      19
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SolidMask"
+   },
+   "widgets_values": [
+    1.0,
+    972,
+    972
+   ]
+  },
+  {
+   "id": 22,
+   "type": "JoinImageWithAlpha",
+   "pos": [
+    40,
+    1270
+   ],
+   "size": [
+    380,
+    98
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "alpha",
+     "type": "MASK",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      21,
+      22,
+      26,
+      28,
+      30,
+      32,
+      35,
+      37,
+      39,
+      41
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "JoinImageWithAlpha"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 27,
+   "type": "SolidMask",
+   "pos": [
+    40,
+    1408
+   ],
+   "size": [
+    380,
+    124
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [
+      25
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SolidMask"
+   },
+   "widgets_values": [
+    1.0,
+    704,
+    704
+   ]
+  },
+  {
+   "id": 29,
+   "type": "JoinImageWithAlpha",
+   "pos": [
+    40,
+    1572
+   ],
+   "size": [
+    380,
+    98
+   ],
+   "flags": {},
+   "order": 10,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "alpha",
+     "type": "MASK",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      34
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "JoinImageWithAlpha"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 2,
+   "type": "CLIPTextEncode",
+   "pos": [
+    440,
+    80
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 11,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      4
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "masterpiece, best quality, amazing quality, very aesthetic, absurdres, game ui element sheet, japanese fantasy ui kit, several separate ui widgets arranged on one canvas: rounded button, progress bar, small icon frame, slider track, tooltip box, gold trim, cherry blossom ornament, semi transparent dark panel, flat color, clean vector-like shapes, crisp edges, evenly spaced, pure white background"
+   ]
+  },
+  {
+   "id": 3,
+   "type": "CLIPTextEncode",
+   "pos": [
+    440,
+    200
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 12,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 2
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      5
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, artist name, ugly, deformed, character, person, 1girl, face, hands, text, letters, kanji, watermark, photo, 3d render, noisy texture, overlapping widgets, collage of photos, single large panel filling the canvas"
+   ]
+  },
+  {
+   "id": 7,
+   "type": "RMBG",
+   "pos": [
+    440,
+    320
+   ],
+   "size": [
+    380,
+    254
+   ],
+   "flags": {},
+   "order": 13,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 7
+    },
+    {
+     "name": "background_color",
+     "type": "COLORCODE",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [
+      8
+     ],
+     "slot_index": 1
+    },
+    {
+     "name": "MASK_IMAGE",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 2
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "RMBG"
+   },
+   "widgets_values": [
+    "RMBG-2.0",
+    1.0,
+    1024,
+    0,
+    0,
+    false,
+    true,
+    "Alpha"
+   ]
+  },
+  {
+   "id": 10,
+   "type": "SaveImage",
+   "pos": [
+    440,
+    614
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 14,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 9
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "GameArt/09_UI/ui_element_sheet"
+   ]
+  },
+  {
+   "id": 11,
+   "type": "CLIPTextEncode",
+   "pos": [
+    440,
+    734
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 15,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 10
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      13
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "masterpiece, best quality, amazing quality, very aesthetic, absurdres, game ui dialog panel, ONE single square panel, nine-slice template, perfectly rectangular and centered, fills the whole canvas edge to edge, uniform thick ornamental border on all four sides, border width about one sixth of canvas, corner radius 64, the entire interior filled with solid dark navy blue, the interior is clearly much darker than the pure white background, no pattern and no illustration inside, gold trim and cherry blossom ornament only along the border, flat color, clean vector-like shapes, crisp straight edges, pure white background around the panel"
+   ]
+  },
+  {
+   "id": 12,
+   "type": "CLIPTextEncode",
+   "pos": [
+    440,
+    854
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 16,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 11
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      14
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, artist name, ugly, deformed, character, person, 1girl, face, text, letters, kanji, watermark, photo, 3d render, noisy texture, multiple panels, collage, bevel, drop shadow, white margin, white frame ring, off center, tilted, perspective, pattern in the center, illustration inside panel, picture frame with photo, white interior, white fill, light gray fill, hollow frame, empty white box, outline only"
+   ]
+  },
+  {
+   "id": 16,
+   "type": "RMBG",
+   "pos": [
+    440,
+    974
+   ],
+   "size": [
+    380,
+    254
+   ],
+   "flags": {},
+   "order": 17,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 16
+    },
+    {
+     "name": "background_color",
+     "type": "COLORCODE",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [
+      17
+     ],
+     "slot_index": 1
+    },
+    {
+     "name": "MASK_IMAGE",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 2
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "RMBG"
+   },
+   "widgets_values": [
+    "RMBG-2.0",
+    1.0,
+    1024,
+    0,
+    0,
+    false,
+    true,
+    "Alpha"
+   ]
+  },
+  {
+   "id": 20,
+   "type": "MaskComposite",
+   "pos": [
+    440,
+    1268
+   ],
+   "size": [
+    380,
+    124
+   ],
+   "flags": {},
+   "order": 18,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "destination",
+     "type": "MASK",
+     "link": 18
+    },
+    {
+     "name": "source",
+     "type": "MASK",
+     "link": 19
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [
+      20
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "MaskComposite"
+   },
+   "widgets_values": [
+    26,
+    26,
+    "add"
+   ]
+  },
+  {
+   "id": 23,
+   "type": "SaveImage",
+   "pos": [
+    440,
+    1432
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 19,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 21
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "GameArt/09_UI/ui_panel_9slice"
+   ]
+  },
+  {
+   "id": 24,
+   "type": "ImageCrop",
+   "pos": [
+    440,
+    1552
+   ],
+   "size": [
+    380,
+    150
+   ],
+   "flags": {},
+   "order": 20,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 22
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      23
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageCrop"
+   },
+   "widgets_values": [
+    64,
+    64,
+    416,
+    416
+   ]
+  },
+  {
+   "id": 28,
+   "type": "InvertMask",
+   "pos": [
+    440,
+    1742
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 21,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "mask",
+     "type": "MASK",
+     "link": 25
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "InvertMask"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 30,
+   "type": "ImageCrop",
+   "pos": [
+    440,
+    1862
+   ],
+   "size": [
+    380,
+    150
+   ],
+   "flags": {},
+   "order": 22,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 26
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      27
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageCrop"
+   },
+   "widgets_values": [
+    160,
+    160,
+    0,
+    0
+   ]
+  },
+  {
+   "id": 32,
+   "type": "ImageCrop",
+   "pos": [
+    440,
+    2052
+   ],
+   "size": [
+    380,
+    150
+   ],
+   "flags": {},
+   "order": 23,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 28
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      29
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageCrop"
+   },
+   "widgets_values": [
+    704,
+    160,
+    160,
+    0
+   ]
+  },
+  {
+   "id": 34,
+   "type": "ImageCrop",
+   "pos": [
+    440,
+    2242
+   ],
+   "size": [
+    380,
+    150
+   ],
+   "flags": {},
+   "order": 24,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 30
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      31
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageCrop"
+   },
+   "widgets_values": [
+    160,
+    160,
+    864,
+    0
+   ]
+  },
+  {
+   "id": 36,
+   "type": "ImageCrop",
+   "pos": [
+    440,
+    2432
+   ],
+   "size": [
+    380,
+    150
+   ],
+   "flags": {},
+   "order": 25,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 32
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      33
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageCrop"
+   },
+   "widgets_values": [
+    160,
+    704,
+    0,
+    160
+   ]
+  },
+  {
+   "id": 38,
+   "type": "SaveImage",
+   "pos": [
+    440,
+    2622
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 26,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 34
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "GameArt/09_UI/9slice_mc_704x704"
+   ]
+  },
+  {
+   "id": 39,
+   "type": "ImageCrop",
+   "pos": [
+    440,
+    2742
+   ],
+   "size": [
+    380,
+    150
+   ],
+   "flags": {},
+   "order": 27,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 35
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      36
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageCrop"
+   },
+   "widgets_values": [
+    160,
+    704,
+    864,
+    160
+   ]
+  },
+  {
+   "id": 41,
+   "type": "ImageCrop",
+   "pos": [
+    440,
+    2932
+   ],
+   "size": [
+    380,
+    150
+   ],
+   "flags": {},
+   "order": 28,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 37
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      38
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageCrop"
+   },
+   "widgets_values": [
+    160,
+    160,
+    0,
+    864
+   ]
+  },
+  {
+   "id": 43,
+   "type": "ImageCrop",
+   "pos": [
+    440,
+    3122
+   ],
+   "size": [
+    380,
+    150
+   ],
+   "flags": {},
+   "order": 29,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 39
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      40
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageCrop"
+   },
+   "widgets_values": [
+    704,
+    160,
+    160,
+    864
+   ]
+  },
+  {
+   "id": 45,
+   "type": "ImageCrop",
+   "pos": [
+    440,
+    3312
+   ],
+   "size": [
+    380,
+    150
+   ],
+   "flags": {},
+   "order": 30,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 41
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      42
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageCrop"
+   },
+   "widgets_values": [
+    160,
+    160,
+    864,
+    864
+   ]
+  },
+  {
+   "id": 5,
+   "type": "KSampler",
+   "pos": [
+    840,
+    80
+   ],
+   "size": [
+    380,
+    228
+   ],
+   "flags": {},
+   "order": 31,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 3
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 4
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 5
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 6
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "widgets_values": [
+    20261112,
+    "randomize",
+    28,
+    7.0,
+    "dpmpp_2m",
+    "karras",
+    1.0
+   ]
+  },
+  {
+   "id": 8,
+   "type": "InvertMask",
+   "pos": [
+    840,
+    348
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 32,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "mask",
+     "type": "MASK",
+     "link": 8
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "InvertMask"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 14,
+   "type": "KSampler",
+   "pos": [
+    840,
+    468
+   ],
+   "size": [
+    380,
+    228
+   ],
+   "flags": {},
+   "order": 33,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 12
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 13
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 14
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 15
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "widgets_values": [
+    20261113,
+    "randomize",
+    30,
+    7.0,
+    "dpmpp_2m",
+    "karras",
+    1.0
+   ]
+  },
+  {
+   "id": 17,
+   "type": "InvertMask",
+   "pos": [
+    840,
+    736
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 34,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "mask",
+     "type": "MASK",
+     "link": 17
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "InvertMask"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 21,
+   "type": "InvertMask",
+   "pos": [
+    840,
+    856
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 35,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "mask",
+     "type": "MASK",
+     "link": 20
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "InvertMask"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 25,
+   "type": "ImageScale",
+   "pos": [
+    840,
+    976
+   ],
+   "size": [
+    380,
+    150
+   ],
+   "flags": {},
+   "order": 36,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 23
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      24
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageScale"
+   },
+   "widgets_values": [
+    "bilinear",
+    1,
+    1,
+    "disabled"
+   ]
+  },
+  {
+   "id": 31,
+   "type": "SaveImage",
+   "pos": [
+    840,
+    1166
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 37,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 27
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "GameArt/09_UI/9slice_tl_160x160"
+   ]
+  },
+  {
+   "id": 33,
+   "type": "SaveImage",
+   "pos": [
+    840,
+    1286
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 38,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 29
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "GameArt/09_UI/9slice_tc_704x160"
+   ]
+  },
+  {
+   "id": 35,
+   "type": "SaveImage",
+   "pos": [
+    840,
+    1406
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 39,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 31
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "GameArt/09_UI/9slice_tr_160x160"
+   ]
+  },
+  {
+   "id": 37,
+   "type": "SaveImage",
+   "pos": [
+    840,
+    1526
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 40,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 33
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "GameArt/09_UI/9slice_ml_160x704"
+   ]
+  },
+  {
+   "id": 40,
+   "type": "SaveImage",
+   "pos": [
+    840,
+    1646
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 41,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 36
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "GameArt/09_UI/9slice_mr_160x704"
+   ]
+  },
+  {
+   "id": 42,
+   "type": "SaveImage",
+   "pos": [
+    840,
+    1766
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 42,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 38
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "GameArt/09_UI/9slice_bl_160x160"
+   ]
+  },
+  {
+   "id": 44,
+   "type": "SaveImage",
+   "pos": [
+    840,
+    1886
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 43,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 40
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "GameArt/09_UI/9slice_bc_704x160"
+   ]
+  },
+  {
+   "id": 46,
+   "type": "SaveImage",
+   "pos": [
+    840,
+    2006
+   ],
+   "size": [
+    380,
+    80
+   ],
+   "flags": {},
+   "order": 44,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 42
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "GameArt/09_UI/9slice_br_160x160"
+   ]
+  },
+  {
+   "id": 26,
+   "type": "ImageScale",
+   "pos": [
+    1240,
+    80
+   ],
+   "size": [
+    380,
+    150
+   ],
+   "flags": {},
+   "order": 45,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 24
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageScale"
+   },
+   "widgets_values": [
+    "bilinear",
+    704,
+    704,
+    "disabled"
+   ]
+  },
+  {
+   "id": 900,
+   "type": "Note",
+   "pos": [
+    -1400,
+    80
+   ],
+   "size": [
+    580,
+    300
+   ],
+   "flags": {},
+   "order": -1,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "title": "09 UI 元素板 + 九宫格面板（双分支）",
+   "properties": {
+    "text": ""
+   },
+   "widgets_values": [
+    "【09 UI 元素板 + 九宫格面板（两条分支）】\n用途：日式萌系 UI。分支 A 出一张「UI 元素板」（按钮/进度条/图标框/滑块/提示框排一板，供美术直接切片）；分支 B 出一张「九宫格面板」并切成 9 块，供引擎 9-slice 拉伸。\n为什么要分两条：实测把元素板直接按九宫格硬切，切块会穿过板内各控件的图案，tl/mc 全是断裂线条、无法平铺。9-slice 必须用「结构规整的单一面板」才切得对。\n分支 B 最终链路：SDXL 1024 出面板 → 几何 alpha（SolidMask 全 0 + 内缩 INSET=26 的实心矩形，MaskComposite add 后 InvertMask）→ JoinImageWithAlpha → ImageCrop 按 3x3 切 9 块；中心块取面板中心区域平均色重建为绝对纯色。\n为什么不用抠图：1) 白底色键（AILab_ColorToMask threshold 12/22）实测失效——SDXL 不保证纯白背景，实测面板图角落 RGB≈0.228 是深色，全图被判成背景、面板输出全透明（nz=0.0000）；2) RMBG 也不稳——实测 00005 那张左下角块被误判为背景（bl nz=0.0012）。面板是规整矩形时，几何 alpha 才是唯一可靠解。\n切块规则：C=160，tc/bc 704x160 横向拉伸，ml/mr 160x704 纵向拉伸，mc 704x704 双向拉伸；中心块 alpha 铺满、RGB 唯一色数=1（可任意拉伸不变形）。\n实测(00006)：面板 nz=0.8481，四角块 nz=0.7014、四边块 nz=0.8375、中心块 nz=1.0000 且唯一色数=1；用 9 块合成 1280x720 后中心 alpha=1.000、边框连贯无接缝、目检合格。\n已知限制：几何 alpha 出来是直角，四角不再带圆角；需要圆角请在引擎侧叠一张圆角遮罩。面板若生成得偏上偏右，切块会有一侧偏薄，重出即可。\n验收标准：9 块全部有内容（nz>0.5）、mc 唯一色数=1、1280x720 合成图边框连贯。"
+   ],
+   "color": "#1f3a2f",
+   "bgcolor": "#1a2b23"
+  }
+ ],
+ "links": [
+  [
+   1,
+   1,
+   1,
+   2,
+   0,
+   "CLIP"
+  ],
+  [
+   2,
+   1,
+   1,
+   3,
+   0,
+   "CLIP"
+  ],
+  [
+   3,
+   1,
+   0,
+   5,
+   0,
+   "MODEL"
+  ],
+  [
+   4,
+   2,
+   0,
+   5,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   5,
+   3,
+   0,
+   5,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   6,
+   4,
+   0,
+   5,
+   3,
+   "LATENT"
+  ],
+  [
+   7,
+   6,
+   0,
+   7,
+   0,
+   "IMAGE"
+  ],
+  [
+   8,
+   7,
+   1,
+   8,
+   0,
+   "MASK"
+  ],
+  [
+   9,
+   9,
+   0,
+   10,
+   0,
+   "IMAGE"
+  ],
+  [
+   10,
+   1,
+   1,
+   11,
+   0,
+   "CLIP"
+  ],
+  [
+   11,
+   1,
+   1,
+   12,
+   0,
+   "CLIP"
+  ],
+  [
+   12,
+   1,
+   0,
+   14,
+   0,
+   "MODEL"
+  ],
+  [
+   13,
+   11,
+   0,
+   14,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   14,
+   12,
+   0,
+   14,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   15,
+   13,
+   0,
+   14,
+   3,
+   "LATENT"
+  ],
+  [
+   16,
+   15,
+   0,
+   16,
+   0,
+   "IMAGE"
+  ],
+  [
+   17,
+   16,
+   1,
+   17,
+   0,
+   "MASK"
+  ],
+  [
+   18,
+   18,
+   0,
+   20,
+   0,
+   "MASK"
+  ],
+  [
+   19,
+   19,
+   0,
+   20,
+   1,
+   "MASK"
+  ],
+  [
+   20,
+   20,
+   0,
+   21,
+   0,
+   "MASK"
+  ],
+  [
+   21,
+   22,
+   0,
+   23,
+   0,
+   "IMAGE"
+  ],
+  [
+   22,
+   22,
+   0,
+   24,
+   0,
+   "IMAGE"
+  ],
+  [
+   23,
+   24,
+   0,
+   25,
+   0,
+   "IMAGE"
+  ],
+  [
+   24,
+   25,
+   0,
+   26,
+   0,
+   "IMAGE"
+  ],
+  [
+   25,
+   27,
+   0,
+   28,
+   0,
+   "MASK"
+  ],
+  [
+   26,
+   22,
+   0,
+   30,
+   0,
+   "IMAGE"
+  ],
+  [
+   27,
+   30,
+   0,
+   31,
+   0,
+   "IMAGE"
+  ],
+  [
+   28,
+   22,
+   0,
+   32,
+   0,
+   "IMAGE"
+  ],
+  [
+   29,
+   32,
+   0,
+   33,
+   0,
+   "IMAGE"
+  ],
+  [
+   30,
+   22,
+   0,
+   34,
+   0,
+   "IMAGE"
+  ],
+  [
+   31,
+   34,
+   0,
+   35,
+   0,
+   "IMAGE"
+  ],
+  [
+   32,
+   22,
+   0,
+   36,
+   0,
+   "IMAGE"
+  ],
+  [
+   33,
+   36,
+   0,
+   37,
+   0,
+   "IMAGE"
+  ],
+  [
+   34,
+   29,
+   0,
+   38,
+   0,
+   "IMAGE"
+  ],
+  [
+   35,
+   22,
+   0,
+   39,
+   0,
+   "IMAGE"
+  ],
+  [
+   36,
+   39,
+   0,
+   40,
+   0,
+   "IMAGE"
+  ],
+  [
+   37,
+   22,
+   0,
+   41,
+   0,
+   "IMAGE"
+  ],
+  [
+   38,
+   41,
+   0,
+   42,
+   0,
+   "IMAGE"
+  ],
+  [
+   39,
+   22,
+   0,
+   43,
+   0,
+   "IMAGE"
+  ],
+  [
+   40,
+   43,
+   0,
+   44,
+   0,
+   "IMAGE"
+  ],
+  [
+   41,
+   22,
+   0,
+   45,
+   0,
+   "IMAGE"
+  ],
+  [
+   42,
+   45,
+   0,
+   46,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.75,
+   "offset": [
+    0,
+    0
+   ]
+  }
+ },
+ "version": 0.4
+}

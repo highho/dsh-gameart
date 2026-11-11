@@ -1,0 +1,277 @@
+{
+ "1": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "sprite_alpha_00002_.png"
+  }
+ },
+ "2": {
+  "class_type": "SAMLoader",
+  "inputs": {
+   "model_name": "sam_vit_b_01ec64.pth",
+   "device_mode": "Prefer GPU"
+  }
+ },
+ "3": {
+  "class_type": "UltralyticsDetectorProvider",
+  "inputs": {
+   "model_name": "bbox/face_yolov8m.pt"
+  }
+ },
+ "4": {
+  "class_type": "BboxDetectorSEGS",
+  "inputs": {
+   "threshold": 0.3,
+   "dilation": 12,
+   "crop_factor": 3.0,
+   "drop_size": 10,
+   "labels": "all",
+   "bbox_detector": [
+    "3",
+    0
+   ],
+   "image": [
+    "1",
+    0
+   ]
+  }
+ },
+ "5": {
+  "class_type": "SAMDetectorCombined",
+  "inputs": {
+   "detection_hint": "center-1",
+   "dilation": 0,
+   "threshold": 0.88,
+   "bbox_expansion": 0,
+   "mask_hint_threshold": 0.7,
+   "mask_hint_use_negative": "False",
+   "sam_model": [
+    "2",
+    0
+   ],
+   "segs": [
+    "4",
+    0
+   ],
+   "image": [
+    "1",
+    0
+   ]
+  }
+ },
+ "6": {
+  "class_type": "RMBG",
+  "inputs": {
+   "model": "RMBG-2.0",
+   "sensitivity": 1.0,
+   "process_res": 1024,
+   "mask_blur": 0,
+   "mask_offset": 0,
+   "invert_output": false,
+   "refine_foreground": true,
+   "background": "Alpha",
+   "background_color": "#222222",
+   "image": [
+    "1",
+    0
+   ]
+  }
+ },
+ "7": {
+  "class_type": "InvertMask",
+  "inputs": {
+   "mask": [
+    "1",
+    1
+   ]
+  }
+ },
+ "8": {
+  "class_type": "MaskComposite",
+  "inputs": {
+   "x": 0,
+   "y": 0,
+   "operation": "add",
+   "destination": [
+    "7",
+    0
+   ],
+   "source": [
+    "6",
+    1
+   ]
+  }
+ },
+ "9": {
+  "class_type": "GrowMask",
+  "inputs": {
+   "expand": 25,
+   "tapered_corners": true,
+   "mask": [
+    "5",
+    0
+   ]
+  }
+ },
+ "10": {
+  "class_type": "MaskComposite",
+  "inputs": {
+   "x": 0,
+   "y": 0,
+   "operation": "subtract",
+   "destination": [
+    "8",
+    0
+   ],
+   "source": [
+    "9",
+    0
+   ]
+  }
+ },
+ "11": {
+  "class_type": "EmptyImage",
+  "inputs": {
+   "width": 640,
+   "height": 896,
+   "batch_size": 1,
+   "color": 0
+  }
+ },
+ "12": {
+  "class_type": "MaskComposite",
+  "inputs": {
+   "x": 0,
+   "y": 0,
+   "operation": "multiply",
+   "destination": [
+    "9",
+    0
+   ],
+   "source": [
+    "8",
+    0
+   ]
+  }
+ },
+ "13": {
+  "class_type": "ImageCompositeMasked",
+  "inputs": {
+   "x": 0,
+   "y": 0,
+   "resize_source": false,
+   "destination": [
+    "11",
+    0
+   ],
+   "source": [
+    "1",
+    0
+   ],
+   "mask": [
+    "12",
+    0
+   ]
+  }
+ },
+ "14": {
+  "class_type": "InvertMask",
+  "inputs": {
+   "mask": [
+    "12",
+    0
+   ]
+  }
+ },
+ "15": {
+  "class_type": "JoinImageWithAlpha",
+  "inputs": {
+   "image": [
+    "13",
+    0
+   ],
+   "alpha": [
+    "14",
+    0
+   ]
+  }
+ },
+ "16": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/10_Parts/part_head",
+   "images": [
+    "15",
+    0
+   ]
+  }
+ },
+ "17": {
+  "class_type": "MaskComposite",
+  "inputs": {
+   "x": 0,
+   "y": 0,
+   "operation": "multiply",
+   "destination": [
+    "10",
+    0
+   ],
+   "source": [
+    "8",
+    0
+   ]
+  }
+ },
+ "18": {
+  "class_type": "ImageCompositeMasked",
+  "inputs": {
+   "x": 0,
+   "y": 0,
+   "resize_source": false,
+   "destination": [
+    "11",
+    0
+   ],
+   "source": [
+    "1",
+    0
+   ],
+   "mask": [
+    "17",
+    0
+   ]
+  }
+ },
+ "19": {
+  "class_type": "InvertMask",
+  "inputs": {
+   "mask": [
+    "17",
+    0
+   ]
+  }
+ },
+ "20": {
+  "class_type": "JoinImageWithAlpha",
+  "inputs": {
+   "image": [
+    "18",
+    0
+   ],
+   "alpha": [
+    "19",
+    0
+   ]
+  }
+ },
+ "21": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "GameArt/10_Parts/part_body",
+   "images": [
+    "20",
+    0
+   ]
+  }
+ }
+}

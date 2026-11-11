@@ -1,0 +1,169 @@
+{
+  "id": "gameart-pipeline",
+  "name": "gameart_pipeline",
+  "display_name": "游戏美术产线组（ComfyUI）",
+  "version": "1.0.0",
+  "description": "基于本地 ComfyUI + SDXL 日式萌系底模的 12 条游戏美术产线；本次交付精修 08 场景背景 / 09 UI 九宫格 / 10 角色部件分层 / 11 光效粒子，并提供可直接调用的 Python 接口。",
+  "kind": "comfyui-workflow-pack",
+  "language": "python",
+  "license": "internal",
+  "python": {
+    "entry_module": "gameart_pipeline",
+    "entry_file": "gameart_pipeline/runner.py",
+    "min_version": "3.9",
+    "dependencies": []
+  },
+  "env": {
+    "COMFY_BASE": {
+      "default": "http://127.0.0.1:8188",
+      "desc": "ComfyUI 服务地址"
+    },
+    "COMFY_WF_DIR": {
+      "default": "<plugin>/workflows",
+      "desc": "UI 格式工作流输出目录，可指向 ComfyUI 的 user/default/workflows 以在面板中直接加载"
+    },
+    "COMFY_API_DIR": {
+      "default": "<plugin>/api",
+      "desc": "API 格式工作流输出目录（提交给 /prompt 的形态）"
+    },
+    "COMFY_OBJINFO": {
+      "default": "",
+      "desc": "节点 schema 快照路径；留空则自动查找 plugin 内 objinfo_latest.json，仍缺失时在线拉取"
+    }
+  },
+  "actions": [
+    {
+      "id": "list_pipelines",
+      "title": "列出产线",
+      "entry": "gameart_pipeline.list_pipelines",
+      "inputs": {},
+      "outputs": "array<pipeline>"
+    },
+    {
+      "id": "build",
+      "title": "构建工作流 JSON",
+      "entry": "gameart_pipeline.build",
+      "inputs": {
+        "ids": {
+          "type": "array<string>",
+          "required": false,
+          "desc": "产线号，缺省为全部"
+        },
+        "write": {
+          "type": "boolean",
+          "default": true,
+          "desc": "false 时只做内存校验"
+        }
+      },
+      "outputs": "object<pipeline_id, {ok,nodes,ui,api,errors}>"
+    },
+    {
+      "id": "run",
+      "title": "执行产线出图",
+      "entry": "gameart_pipeline.run",
+      "inputs": {
+        "pipeline_id": {
+          "type": "string",
+          "enum": ["08", "09", "10", "11"],
+          "required": true
+        },
+        "overrides": {
+          "type": "object",
+          "required": false,
+          "desc": "可覆盖 prompt / negative / seed / steps / cfg / width / height / batch_size / sampler_name / scheduler"
+        },
+        "timeout": {
+          "type": "integer",
+          "default": 560,
+          "desc": "单次执行超时秒数"
+        }
+      },
+      "outputs": "object<ok, pipeline, images, elapsed, applied_overrides>"
+    },
+    {
+      "id": "slice_panel",
+      "title": "九宫格切图",
+      "entry": "gameart_pipeline.slice_panel",
+      "inputs": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "desc": "面板 PNG 绝对路径（09 产线输出）"
+        },
+        "out_dir": {
+          "type": "string",
+          "required": false,
+          "desc": "切块输出目录，缺省为面板同级的 nineslice/"
+        },
+        "C": {
+          "type": "integer",
+          "default": 160,
+          "desc": "角/边块边长上限，实际取 min(C, w//4, h//4)"
+        }
+      },
+      "outputs": "object<ok, panel, size, corner, center_rgb, files>"
+    },
+    {
+      "id": "info",
+      "title": "环境自检",
+      "entry": "gameart_pipeline.info",
+      "inputs": {},
+      "outputs": "object<online, comfyui, schema_nodes, ckpt_ready>"
+    }
+  ],
+  "pipelines": [
+    {
+      "id": "08",
+      "name": "08_Background",
+      "title": "场景背景",
+      "workflow": "workflows/08_Background.json",
+      "api": "api/api_08.json",
+      "nodes": 9
+    },
+    {
+      "id": "09",
+      "name": "09_UI_NineSlice",
+      "title": "UI 九宫格面板 + 元素板",
+      "workflow": "workflows/09_UI_NineSlice.json",
+      "api": "api/api_09.json",
+      "nodes": 47
+    },
+    {
+      "id": "10",
+      "name": "10_Character_Parts",
+      "title": "角色部件分层",
+      "workflow": "workflows/10_Character_Parts.json",
+      "api": "api/api_10.json",
+      "nodes": 22
+    },
+    {
+      "id": "11",
+      "name": "11_FX_Particle",
+      "title": "光效粒子贴图",
+      "workflow": "workflows/11_FX_Particle.json",
+      "api": "api/api_11.json",
+      "nodes": 16
+    }
+  ],
+  "requires": {
+    "comfyui": ">=0.33.2",
+    "custom_nodes": ["ComfyUI-Impact-Pack", "ComfyUI-Inspire-Pack", "ComfyUI_IPAdapter_plus", "was-node-suite-comfyui", "ComfyUI_UltimateSDUpscale", "ComfyUI-RMBG", "comfyui_controlnet_aux"],
+    "models": {
+      "checkpoints": ["animagine-xl-3.1.safetensors"],
+      "vae": ["sdxl_vae_fp16_fix.safetensors"],
+      "clip_vision": ["CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors"],
+      "ipadapter": ["ip-adapter-plus_sdxl_vit-h.safetensors"],
+      "controlnet": ["controlnet-union-sdxl-promax.safetensors"],
+      "RMBG": ["RMBG-2.0.safetensors"],
+      "embeddings": ["EasyNegative.safetensors"],
+      "ultralytics_bbox": ["face_yolov8m.pt", "hand_yolov8s.pt"],
+      "sams": ["sam_vit_b_01ec64.pth"],
+      "upscale_models": ["RealESRGAN_x4plus_anime_6B.pth"]
+    }
+  },
+  "art_direction": {
+    "style": "japanese anime / moe（日式萌系）",
+    "base_model": "SDXL animagine-xl-3.1",
+    "excluded": ["pixel art", "3D render/model"]
+  }
+}
