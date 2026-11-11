@@ -51,7 +51,7 @@ META = {
     "11": {
         "title": "光效粒子贴图",
         "use": "加色混合叠加的黑底能量/粒子贴图",
-        "output": "1024x1024 RGBA，batch=12",
+        "output": "1024x1024 RGBA，batch=3（一次出 3 张候选）",
         "params": ["prompt", "negative", "seed", "steps", "cfg"],
     },
 }
