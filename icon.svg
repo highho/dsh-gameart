@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="GameArt pipeline">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7C5CFF"/>
+      <stop offset="1" stop-color="#3D2E80"/>
+    </linearGradient>
+    <linearGradient id="swatch" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FF8FB1"/>
+      <stop offset="1" stop-color="#FF5C8A"/>
+    </linearGradient>
+    <!-- 拇指孔用 mask 挖，避免在渐变背景上贴色块留下色差 -->
+    <mask id="thumb">
+      <rect x="0" y="0" width="64" height="64" fill="#fff"/>
+      <ellipse cx="21.5" cy="34.5" rx="3.4" ry="2.8" fill="#000"/>
+    </mask>
+  </defs>
+
+  <!-- 背板 -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bg)"/>
+
+  <!-- 调色板：主体收在左上，给右下角的笔刷留出呼吸空间 -->
+  <path d="M31 11c-9.6 0-17.4 6.6-17.4 14.8 0 8.1 7.8 14.7 17.4 14.7 1.5 0 2.7-1.1 2.9-2.5l.3-2.1c.2-1.5 1.5-2.6 3-2.6h1.9c4.9 0 8.9-3.4 8.9-7.5C48.4 17.6 40.6 11 31 11z"
+        fill="#FFF6FB" fill-opacity="0.96" mask="url(#thumb)"/>
+
+  <!-- 三个颜料点 -->
+  <circle cx="24" cy="22.5" r="2.9" fill="url(#swatch)"/>
+  <circle cx="33.5" cy="19.5" r="2.4" fill="#FFD166"/>
+  <circle cx="41.5" cy="25.5" r="2.6" fill="#4FD1C5"/>
+
+  <!-- 笔刷：与调色板断开，斜向右下，带笔尖 -->
+  <g transform="rotate(45 48 48)">
+    <rect x="45.6" y="41.5" width="4.8" height="9" rx="1.6" fill="#FFF6FB" fill-opacity="0.94"/>
+    <path d="M45.6 50.5h4.8l-2.4 4.6z" fill="#FFF6FB" fill-opacity="0.94"/>
+  </g>
+</svg>

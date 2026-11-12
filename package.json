@@ -1,12 +1,12 @@
 {
   "name": "dsh-gameart",
   "version": "0.1.0",
-  "private": true,
   "description": "游戏美术产线组（ComfyUI / SD1.5 + SDXL 两代底模）的 DSH 封装：12 条产线 · 七个工具 + 专家预设 + 技能库",
   "type": "module",
   "main": "index.mjs",
   "files": [
     "index.mjs",
+    "icon.svg",
     "lib",
     "cordis.patch.yml",
     "skills",
@@ -28,8 +28,18 @@
     "animagine"
   ],
   "license": "MIT",
+  "author": "highho",
+  "homepage": "https://github.com/highho/dsh-gameart#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/highho/dsh-gameart.git"
+  },
+  "bugs": {
+    "url": "https://github.com/highho/dsh-gameart/issues"
+  },
   "engines": {
-    "node": ">=20"
+    "node": ">=20",
+    "dsh": ">=0.2.0 <0.3.0"
   },
   "scripts": {
     "test": "node test/check-patch.mjs && node test/check-module.mjs && node test/check-plugin.mjs && node test/check-e2e.mjs && python test/check-imageqa.py"

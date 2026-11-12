@@ -283,7 +283,7 @@ export function apply(ctx, config = {}) {
               ready: data.online === true && data.ckpt_ready === true,
               hint:
                 data.online !== true
-                  ? 'ComfyUI 没在监听。让用户启动 ComfyUI（E:\\AAAKI\\ComfyUI-aki\\ComfyUI-aki-v3 下的绘世启动器），确认端口 8188 后再重试。'
+                  ? 'ComfyUI 没在监听。让用户启动 ComfyUI（绘世启动器 / main.py），确认端口 8188 再重试；ComfyUI 不在本机或不在默认端口时，用环境变量 COMFY_BASE 指定，例如 COMFY_BASE=http://192.168.1.10:8188。'
                   : data.ckpt_ready !== true
                     ? (data.ckpt_sdxl_ready === false && data.ckpt_sd15_ready === false
                         ? '两代底模都缺：SDXL animagine-xl-3.1.safetensors（08/09/11）与 SD1.5 anything-v5-PrtRE.safetensors（00~07）。补装模型，不要改代码。'
