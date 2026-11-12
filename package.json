@@ -39,7 +39,7 @@
   },
   "engines": {
     "node": ">=20",
-    "dsh": ">=0.2.0 <0.3.0"
+    "dsh": ">=0.2.0-0 <0.3.0-0 || >=0.2.1-rc.0 <0.3.0"
   },
   "scripts": {
     "test": "node test/check-patch.mjs && node test/check-module.mjs && node test/check-plugin.mjs && node test/check-e2e.mjs && python test/check-imageqa.py"
