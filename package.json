@@ -27,7 +27,7 @@
     "sdxl",
     "animagine"
   ],
-  "license": "internal",
+  "license": "MIT",
   "engines": {
     "node": ">=20"
   },
