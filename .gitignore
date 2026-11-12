@@ -3,3 +3,4 @@ __pycache__/
 .venv/
 sl_test/
 *.log
+.gameart/

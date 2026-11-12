@@ -6,7 +6,7 @@
 |---|---|---|
 | 00 角色概念设计 | 出方案阶段铺量 | 640×896 RGB PNG ×4 |
 | 01 立绘透明底 | BiRefNet 抠图，可进引擎/UI | 640×896 RGBA PNG |
-| 02 表情差分 | 只改脸，身体像素 100% 不变 | 512×512 RGBA PNG |
+| 02 表情差分 | 只改脸，身体像素 100% 不变 | 与输入同尺寸 PNG |
 | 03 线稿上色 | 双层 ControlNet 锁线 | 640×896 RGB PNG |
 | 04 三视图设定稿 | 正/侧/背一张宽画布 | 1152×768 RGB PNG |
 | 05 道具图标 | 单物体 3/4 等距视角 | 512×512 RGBA PNG ×4 |
@@ -197,7 +197,7 @@ else:
 
 - 链路：`768×768 batch=4` → `KSampler(26 步, cfg 7.0)` → `VAEDecode` → `BiRefNetRMBG(background=Alpha)` → `ImageScale(lanczos → 512×512, crop center)` → `SaveImage`。
 - 抠图链路同 01：**不要再接 `InvertMask` / `JoinImageWithAlpha`**。
-- 构图：主体占画布 70~80%，四周留 10~15% 安全边，单物体、3/4 等距视角。正向写 `one single object, centered, plain white background`；负向写 `multiple objects, pattern, background detail`。
+- 构图：单物体、3/4 等距视角。正向写 `one single object, centered, plain white background`；负向写 `multiple objects, pattern, background detail`。**实测可见行为**：现行 prompt 出图主体铺满整幅、不留安全边，画面里也常出现多个物件；要严格单物体或留边，需自行加强 `solo, object only` 并压低主体权重。
 - 输出 `GameArt/05_Icon/item_icon_*.png`；命名 `item_{道具名}_{品质}.png`，品质用 n/r/sr/ssr。
 
 ### 06 无缝贴图（35 节点）

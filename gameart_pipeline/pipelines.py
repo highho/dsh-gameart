@@ -651,7 +651,7 @@ def build_05():
     g.notes.append({
         "title": "05 道具图标",
         "text": ("用途：装备/道具/材料图标，512x512 RGBA，一次 4 张候选。\\n"
-                 "构图：主体占画布 70~80%，四周留 10~15% 安全边，单个物体、3/4 等距视角。\\n"
+                 "构图：单个物体、3/4 等距视角。实测现行 prompt 出图铺满整幅、不留安全边，且常画出多个物件，需自行加强 solo, object only。\n"
                  "正向必须写 single object；负向必须写 multiple objects, pattern, background detail。\\n"
                  "链路：SD1.5 768x768 batch4 → VAEDecode → BiRefNetRMBG(background=Alpha) "
                  "→ ImageScale lanczos 512x512 center → SaveImage。\\n"

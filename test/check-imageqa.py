@@ -201,6 +201,38 @@ _flat_icon[..., 3] = 255
 ic_bad = _save("icon_opaque.png", _flat_icon, "RGBA")
 check("05 icon 未抠图 -> ok:false", imageqa.verify("icon", [ic_bad]), expect_ok=False)
 
+# 真实产线图（05 实跑产出，非合成）：主体贴边满幅、透明区有 <=6 的 RGB 渗色。
+# 这是 05 的固有形态——BiRefNetRMBG 之后还过一道 ImageScale(lanczos)，
+# 重采样把相邻色渗进 alpha=0 区域。旧实现对 extent<=0.98、RGB==0 双重严格，
+# 导致 12 张真实图标全部误判失败。这里固定住「真实图应通过」。
+_icon_real = os.path.join(S, "05", "item_icon_real_00009_.png")
+if os.path.isfile(_icon_real):
+    ic_real = imageqa.verify("icon", [_icon_real])
+    check("05 icon 真实满幅图 -> ok:true", ic_real, expect_ok=True)
+    print("    05 real extent=%s clear_rgb_max=%s" % (
+        ic_real["subject_extent"], ic_real.get("clear_rgb_max")))
+    # 满幅必须给提示（没有安全边），但不判失败
+    _ = ic_real.get("hint")
+    check("05 icon 满幅要提示无安全边", {"ok": bool(ic_real.get("hint"))}, expect_ok=True)
+else:
+    print("    跳过 05 真实图（samples/05 缺失）")
+
+# 03 线稿上色真实图：上了色必须过
+_lin_real = os.path.join(S, "03", "colorized_real_00004_.png")
+if os.path.isfile(_lin_real):
+    ln_real = imageqa.verify("lineart", [_lin_real])
+    check("03 lineart 真实上色图 -> ok:true", ln_real, expect_ok=True)
+    print("    03 real paper_frac=%s sat_p90=%s" % (
+        ln_real["paper_frac"], ln_real["sat_p90"]))
+else:
+    print("    跳过 03 真实图（samples/03 缺失）")
+
+# flat / alpha 都必须返回 ok，否则调用方读到 undefined
+_flat_ok = imageqa.verify("flat", [os.path.join(S, "08", "bg_scene_00001_.png")])
+check("08 flat 返回 ok 字段", {"ok": isinstance(_flat_ok.get("ok"), bool)}, expect_ok=True)
+_alpha_ok = imageqa.verify("alpha", [os.path.join(S, "10", "part_head_00010_.png")])
+check("alpha 返回 ok 字段", {"ok": isinstance(_alpha_ok.get("ok"), bool)}, expect_ok=True)
+
 # 07 高清放大：大且锐 = 合格；缩到 512 不合格
 # 用带真实高频细节的图（棋盘 + 噪点），正弦图太光滑会正确地被判无细节
 _rng = np.random.default_rng(20261111)

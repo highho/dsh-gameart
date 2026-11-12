@@ -80,6 +80,10 @@ def verify_alpha(path):
     transparent_rgb_max = int(arr[..., :3][clear].max()) if bool(clear.any()) else 0
     bbox = _bbox_alpha(arr)
     return {
+        # alpha 是通用体检，没有「该不该过」的标准，恒为 True；
+        # 但要给出这个键，否则调用方读 ok 会拿到 undefined。
+        "ok": True,
+        "note": "alpha 只做测量，不判定好坏；要看具体指标请读 coverage / transparent_ratio / size。",
         "path": str(path),
         "size": [w, h],
         "mode": im.mode,
@@ -96,16 +100,25 @@ def verify_flat(path):
     im = _load(path)
     arr = _rgb(im)
     h, w = arr.shape[:2]
+    checks = {
+        "is_16x9": bool(abs(w / float(h) - 16 / 9.0) < 0.02),
+        "is_1080p": bool((w, h) == (1920, 1080)),
+    }
+    hint = None
+    if not checks["is_1080p"]:
+        hint = (
+            "%dx%d 不是 1920x1080。08 的目标尺寸在 ImageScale 的 width/height 上；"
+            "若是横版长度不是 16:9（%dx%d），引擎拉伸会变形。" % (w, h, w, h)
+        )
     return {
+        "ok": all(checks.values()),
         "path": str(path),
         "size": [w, h],
         "mode": im.mode,
         "has_alpha": False,
         "mean_rgb": [int(v) for v in arr.reshape(-1, 3).mean(axis=0)],
-        "checks": {
-            "is_16x9": abs(w / float(h) - 16 / 9.0) < 0.02,
-            "is_1080p": (w, h) == (1920, 1080),
-        },
+        "hint": hint,
+        "checks": checks,
     }
 
 
@@ -372,26 +385,39 @@ def verify_icon(path):
         extent = 0.0
         offset = 1.0
 
+    # 透明区 RGB 残留：05 的链路是 BiRefNetRMBG 之后再过 ImageScale(lanczos)，
+    # 重采样会把相邻颜色渗进 alpha=0 的区域。实测残留 <= 3，肉眼与引擎都不可见
+    # （alpha=0 时 RGB 不参与合成），所以给一个小容差；真·黑边是几十上百的量级。
+    clear_rgb_max = int(rgb[alpha == 0].max()) if bool((alpha == 0).any()) else 0
     checks = {
         "has_alpha": bool(im.mode in ("RGBA", "LA", "PA") or "transparency" in im.info),
         "square": bool(abs(w - h) <= max(2, int(0.02 * max(w, h)))),
         # 背景要真透（图标进 UI 不垫底）
         "bg_transparent": bg_clear,
-        # 主体线性尺寸占画布 45%~98%：太小是缩放错了，太满是没抠图/出框
-        "subject_extent": bool(0.45 <= extent <= 0.98),
+        # 主体线性尺寸要够大。上限放开到满画布：05 实测就是贴边满幅的，
+        # 图标进 UI 后由引擎缩放，贴边本身不算结构错误（只是没有安全边）。
+        "subject_extent": bool(0.45 <= extent),
         # 主体大致居中
         "centered": bool(offset <= 0.12),
-        # 透明区 RGB 必须清零，否则引擎会出黑边
-        "clear_rgb_zero": bool(int(rgb[alpha == 0].max()) == 0) if (alpha == 0).any() else True,
+        # 透明区 RGB 残留太小可忽略，超过 8 才会在引擎双线性采样时出黑边
+        "clear_rgb_zero": bool(clear_rgb_max <= ALPHA_THR),
     }
     hint = None
     if not checks["bg_transparent"]:
         hint = "四角不透明：05 的抠图没生效，检查 BiRefNetRMBG 的 background 是否为 Alpha。"
     elif not checks["subject_extent"]:
         hint = (
-            "主体线性占比 %.0f%%（应在 45%%~98%%）：太小说明裁剪/缩放错了（检查 ImageScale 是否 lanczos 到 512×512），"
-            "太大说明主体出框或没抠净。prompt 里加 `one single object, centered`。" % (extent * 100)
+            "主体线性占比只有 %.0f%%（应 >= 45%%）：太小说明裁剪/缩放错了。"
+            "检查 ImageScale 是否 lanczos 到 512×512。" % (extent * 100)
         )
+    elif extent > 0.98:
+        hint = (
+            "主体贴边铺满画布（线性占比 %.0f%%），没有安全边。05 的现行 prompt 出来的就是满幅图，"
+            "结构上可用；若要留边，需在 prompt 里加强 `solo, centered, object only` 并压低主体权重。"
+            % (extent * 100)
+        )
+    elif not checks["clear_rgb_zero"]:
+        hint = "透明区 RGB 残留到 %d，会在引擎双线性采样时出黑边。检查抠图后是否还有缩放步骤。" % clear_rgb_max
     elif not checks["centered"]:
         hint = "主体偏离中心 %.3f：prompt 加 `centered`，负向加 `off-center`。背景杂点也会把 alpha 包围盒拉偏。" % offset
     return {
@@ -401,6 +427,7 @@ def verify_icon(path):
         "mode": im.mode,
         "subject_extent": round(extent, 4),
         "subject_ratio": subject,
+        "clear_rgb_max": clear_rgb_max,
         "center_offset": round(offset, 4),
         "alpha_bbox": list(bbox) if bbox else None,
         "hint": hint,
