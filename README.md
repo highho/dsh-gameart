@@ -297,8 +297,8 @@ Graph(name) → add(ctype, widgets, links) → validate() → to_api() / to_ui()
 ### 7.1 安装
 
 ```bash
-# 在 DSH 里（不是 shell）
-plugin_manager { action: install_bundle, target: "G:/AItool/dsh_plugin_gameart" }
+# 在 DSH 里（不是 shell），target 填你 clone 下来的绝对路径
+plugin_manager { action: install_bundle, target: "<你本地的 dsh-gameart 目录绝对路径>" }
 ```
 
 装完 `package.json` 里出现 `"dsh-gameart": "link:..."`，bundle 选择列表里多出 `dsh-gameart`。

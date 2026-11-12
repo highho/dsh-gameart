@@ -5,10 +5,41 @@
  * `node -e` 里的 `require` 会静默失败（无输出、exit 0），查不出问题。
  */
 import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
-const yaml = require('C:/Users/36296/.dsh/profiles/desktop/node_modules/yaml/dist/index.js')
+
+// yaml 由 DSH 自带的 profile 依赖提供，不同机器路径不同，不能写死。
+// 依次尝试：本包 node_modules -> DSH_HOME/profile -> 全局 require。
+function loadYaml() {
+  const candidates = []
+  const dshHome = process.env.DSH_HOME || path.join(os.homedir(), '.dsh')
+  const bundles = [
+    'yaml/dist/index.js',
+    'yaml',
+  ]
+  for (const name of bundles) {
+    candidates.push(name)
+    candidates.push(path.join(dshHome, 'profiles', 'desktop', 'node_modules', name))
+    candidates.push(path.join(dshHome, 'profiles', 'web', 'node_modules', name))
+  }
+  for (const candidate of candidates) {
+    try {
+      return require(candidate)
+    } catch {
+      // 继续试下一个
+    }
+  }
+  return null
+}
+
+const yaml = loadYaml()
+if (!yaml) {
+  console.log('SKIP: 找不到 yaml 模块，跳过 YAML 结构校验（可 pnpm add -D yaml 后重试）')
+  process.exit(0)
+}
 
 const text = fs.readFileSync(new URL('../cordis.patch.yml', import.meta.url), 'utf8')
 const doc = yaml.parseDocument(text)
