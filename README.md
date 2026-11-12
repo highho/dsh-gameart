@@ -407,7 +407,7 @@ npm test    # 五套：补丁结构 / 模块导出 / 工具注册 / 端到端 / 
 **仓库内不含任何模型权重。** 运行产线前需自备底模与节点：
 00~07 需要 SD1.5 `anything-v5-PrtRE`，08/09/11 需要 SDXL `animagine-xl-3.1`
 （后者遵循 CreativeML Open RAIL++-M），以及 `requires.custom_nodes` 里列出的
-各 ComfyUI 插件。各资产的许可义务由使用者自行承担，详见 LICENSE 的
-「第三方资产声明」一节。
+各 ComfyUI 插件。各资产的许可义务由使用者自行承担，详见
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
 
 `samples/` 下是产线实际生成结果的样例，只用于测试与验收回归。
