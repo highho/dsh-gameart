@@ -19,26 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-## 第三方资产声明（仓库内不含任何模型权重）
-
-本项目封装的是本地 ComfyUI 产线，**仓库内不含任何模型权重**。使用者
-在运行本包的产线前，需自行取得下列资产的合法授权，并自行承担相应的
-许可义务：
-
-- **animagine-xl-3.1** —— Cagliostro Lab 发布的 SDXL 底模，遵循
-  CreativeML Open RAIL++-M License。使用、再分发与商用前请阅读原文
-  （https://huggingface.co/cagliostrolab/animagine-xl-3.1）。
-- **anything-v5-PrtRE** —— SD1.5 底模，遵循其发布方声明的许可。
-- **ComfyUI** —— 遵循 GPL-3.0，见 https://github.com/comfyanonymous/ComfyUI 。
-- 产线依赖的各 custom_nodes 插件，各自遵循其仓库声明的许可。
-- 生成图的著作权归属依所在地法律与底模许可而定，本包不对生成结果
-  主张任何权利，也不对其可用性作担保。
-
-`workflows/` 与 `api/` 下的工作流 JSON 由本包的 `gameart_pipeline` 生成，
-可自由修改。`gameart_pipeline/objinfo_latest.json` 是 ComfyUI
-`/object_info` 的离线快照，仅用于离线校验节点 schema。
-
-`samples/` 下的图片为本产线实际生成结果的样例，仅用于测试与验收回归。
