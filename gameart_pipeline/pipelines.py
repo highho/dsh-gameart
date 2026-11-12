@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """08~11 四条产线：场景背景 / UI九宫格元素板 / 角色部件分层(SAM拆件) / 光效粒子贴图
-统一日式萌系风格，SDXL(animagine-xl-3.1) 底模。
+统一日式萌系风格。用两代底模：00~07 走 SD1.5(anything-v5-PrtRE)，
+08/09/11 走 SDXL(animagine-xl-3.1)，10 走 SAM 分割不加载底模。
 用法:
   python pipelines2.py build          # 生成 API+UI JSON 并本地校验
   python pipelines2.py run 08 09      # 提交实测
@@ -366,7 +367,7 @@ def build_00():
     g.notes.append({
         "title": "00 角色概念设计",
         "text": ("用途：出方案阶段快速铺量，一次 4 张 640x896。\\n"
-                 "链路：SDXL 640x896 batch4 → VAEDecode → SaveImage。\\n"
+                 "链路：SD1.5 640x896 batch4 → VAEDecode → SaveImage。\\n"
                  "操作位：正向按「风格标签 → 主体 → 服饰道具 → 表情 → 光照 → 背景」顺序写。\\n"
                  "batch_size：铺量建议 4，定稿前改 1 并锁 seed 微调。\\n"
                  "seed：确认构图后固定 seed，只改提示词细节做强控制。\\n"
@@ -652,7 +653,7 @@ def build_05():
         "text": ("用途：装备/道具/材料图标，512x512 RGBA，一次 4 张候选。\\n"
                  "构图：主体占画布 70~80%，四周留 10~15% 安全边，单个物体、3/4 等距视角。\\n"
                  "正向必须写 single object；负向必须写 multiple objects, pattern, background detail。\\n"
-                 "链路：SDXL 768x768 batch4 → VAEDecode → BiRefNetRMBG(background=Alpha) "
+                 "链路：SD1.5 768x768 batch4 → VAEDecode → BiRefNetRMBG(background=Alpha) "
                  "→ ImageScale lanczos 512x512 center → SaveImage。\\n"
                  "⚠ 抠图链路同 01：background=Alpha 时 out(0) 已是 RGBA，"
                  "不要再接 InvertMask/JoinImageWithAlpha（会二次反相把主体清空）。\\n"

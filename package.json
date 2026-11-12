@@ -2,7 +2,7 @@
   "name": "dsh-gameart",
   "version": "0.1.0",
   "private": true,
-  "description": "游戏美术产线组（ComfyUI / SDXL）的 DSH 封装：四条产线工具 + 专家预设 + 技能库",
+  "description": "游戏美术产线组（ComfyUI / SD1.5 + SDXL 两代底模）的 DSH 封装：12 条产线 · 七个工具 + 专家预设 + 技能库",
   "type": "module",
   "main": "index.mjs",
   "files": [

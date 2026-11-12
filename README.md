@@ -166,7 +166,7 @@ else:
 
 ### 01 立绘透明底（9 节点）
 
-- 链路：SDXL 640×896 → `KSampler(30 步, cfg 7.5)` → `VAEDecode` → `BiRefNetRMBG`（`BiRefNet_toonout` / `refine_foreground` / `background=Alpha`）→ `SaveImage`。
+- 链路：SD1.5 640×896 → `KSampler(30 步, cfg 7.5)` → `VAEDecode` → `BiRefNetRMBG`（`BiRefNet_toonout` / `refine_foreground` / `background=Alpha`）→ `SaveImage`。
 - **`background=Alpha` 时 `BiRefNetRMBG` 的 `out(0)` 已经是 RGBA**，不要再接 `InvertMask` + `JoinImageWithAlpha`——会二次反相把前景清空。
 - 白边调 `mask_offset -1~-2`，吞发丝调 `+1`。输出 `GameArt/01_Sprite/sprite_alpha_*.png`。
 - 输出尺寸 640×896 与 00 一致，02 的脸块坐标依赖它。

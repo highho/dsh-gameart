@@ -418,7 +418,7 @@
     "text": ""
    },
    "widgets_values": [
-    "用途：装备/道具/材料图标，512x512 RGBA，一次 4 张候选。\\n构图：主体占画布 70~80%，四周留 10~15% 安全边，单个物体、3/4 等距视角。\\n正向必须写 single object；负向必须写 multiple objects, pattern, background detail。\\n链路：SDXL 768x768 batch4 → VAEDecode → BiRefNetRMBG(background=Alpha) → ImageScale lanczos 512x512 center → SaveImage。\\n⚠ 抠图链路同 01：background=Alpha 时 out(0) 已是 RGBA，不要再接 InvertMask/JoinImageWithAlpha（会二次反相把主体清空）。\\n命名：GameArt/05_Icon/item_{道具名}_{品质}.png，品质用 n/r/sr/ssr。\\n验收：主体完整不出界、背景全透（alpha==0 区域 RGB 归一）、无多余物体。"
+    "用途：装备/道具/材料图标，512x512 RGBA，一次 4 张候选。\\n构图：主体占画布 70~80%，四周留 10~15% 安全边，单个物体、3/4 等距视角。\\n正向必须写 single object；负向必须写 multiple objects, pattern, background detail。\\n链路：SD1.5 768x768 batch4 → VAEDecode → BiRefNetRMBG(background=Alpha) → ImageScale lanczos 512x512 center → SaveImage。\\n⚠ 抠图链路同 01：background=Alpha 时 out(0) 已是 RGBA，不要再接 InvertMask/JoinImageWithAlpha（会二次反相把主体清空）。\\n命名：GameArt/05_Icon/item_{道具名}_{品质}.png，品质用 n/r/sr/ssr。\\n验收：主体完整不出界、背景全透（alpha==0 区域 RGB 归一）、无多余物体。"
    ],
    "color": "#1f3a2f",
    "bgcolor": "#1a2b23"

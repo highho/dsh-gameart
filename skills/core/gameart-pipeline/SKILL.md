@@ -8,7 +8,7 @@ description: |
   ComfyUI 开工前自检、工具调用顺序、输出文件落在哪、以及绝对不能做的事。
   触发词：出图、画一张、生成美术资源、游戏背景、UI 面板、角色立绘、概念设计、表情差分、
   线稿上色、三视图、道具图标、无缝贴图、高清放大、拆件、光效、粒子贴图、
-  ComfyUI、SDXL、animagine、美术产线。
+  ComfyUI、SDXL、SD1.5、animagine、anything-v5、美术产线。
 ---
 
 # 游戏美术产线组 · 总规程

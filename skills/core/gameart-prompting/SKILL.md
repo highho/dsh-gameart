@@ -1,13 +1,13 @@
 ---
 name: gameart-prompting
 description: |
-  给 animagine-xl-3.1（SDXL 日式萌系）写提示词的规程：Danbooru 标签写法、质量词与负向词基线、
+  给 SD1.5（anything-v5-PrtRE，00~07）与 SDXL（animagine-xl-3.1，08/09/11）两代日式萌系底模写提示词的规程：Danbooru 标签写法、两套质量词与负向词基线、
   十二条产线各自的构图配方、seed 复现、以及「用户说的中文怎么翻成标签」。
   要写或改 prompt / negative，或出图风格不对、构图不听话、人物崩坏时读这篇。
   触发词：提示词、prompt、tag、标签、负向词、反向提示词、画风不对、构图不对、danbooru、animagine。
 ---
 
-# 提示词规程（animagine-xl-3.1）
+# 提示词规程（SD1.5 anything-v5-PrtRE / SDXL animagine-xl-3.1 两代）
 
 > **00~07 跑 SD1.5 `anything-v5-PrtRE`，08/09/11 跑 SDXL `animagine-xl-3.1`。** 两代都用
 > Danbooru 标签，但质量词前缀不同：SD1.5 那批用 `masterpiece, best quality, highly detailed,
