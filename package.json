@@ -15,7 +15,8 @@
     "api",
     "plugin.json",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "THIRD-PARTY-NOTICES.md"
   ],
   "keywords": [
     "dsh",
